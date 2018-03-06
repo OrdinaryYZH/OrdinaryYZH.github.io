@@ -78,5 +78,5 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/genericyzh/genericyzh.github.io.git
+  repo: git@github.com:genericyzh/genericyzh.github.io.git
   branch: master

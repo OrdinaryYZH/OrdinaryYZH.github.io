@@ -1,5 +1,5 @@
 ---
-title: SpringBoot项目添加日志之后，无限重启
+title: SpringBoot项目添加日志打包后，无限重启
 date: 2018-3-5 00:00:00
 toc: true
 ---
@@ -18,7 +18,7 @@ toc: true
 
 ```xml
 ...
-	<Appenders>
+    <Appenders>
         ...
         <RollingFile name="RollingFileInfo" fileName="../logs/info.log"
                      filePattern="../logs/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
