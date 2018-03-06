@@ -94,13 +94,22 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="genericyzh">
-<meta property="og:url" content="http://www.genericyzh.com/index.html">
+<meta name="description" content="本篇文章主要叙述遇到这种情况的原因以及解决方法  说明： 项目基于SpringBoot 1.5.9.RELEASE、日志：Slf4j+ log4j2 打包使用maven-jar-plugin + maven-assembly-plugin 1.  起因​    公司项目需要添加本地文件存储日志，所以很自然的在log4j2的配置文件中(log4j2-*.xml)添加RollingFile Appe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot项目添加日志之后，无限重启">
+<meta property="og:url" content="http://www.genericyzh.com/springboot/SpringBoot-restart-problem/index.html">
 <meta property="og:site_name" content="genericyzh">
+<meta property="og:description" content="本篇文章主要叙述遇到这种情况的原因以及解决方法  说明： 项目基于SpringBoot 1.5.9.RELEASE、日志：Slf4j+ log4j2 打包使用maven-jar-plugin + maven-assembly-plugin 1.  起因​    公司项目需要添加本地文件存储日志，所以很自然的在log4j2的配置文件中(log4j2-*.xml)添加RollingFile Appe">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/8747d788gy1fp3d6hpzz5j20p106x0tl.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/8747d788gy1fp3ecc0rikj20uw057wf9.jpg">
+<meta property="og:image" content="http://7xrjzo.com1.z0.glb.clouddn.com/uploads%2Ffull_emotion%2Femotion_pic%2F10091%2F1-1F622210432.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/8747d788gy1fp3e9m98jij213t07odh3.jpg">
+<meta property="og:updated_time" content="2018-03-06T13:21:33.119Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="genericyzh">
+<meta name="twitter:title" content="SpringBoot项目添加日志之后，无限重启">
+<meta name="twitter:description" content="本篇文章主要叙述遇到这种情况的原因以及解决方法  说明： 项目基于SpringBoot 1.5.9.RELEASE、日志：Slf4j+ log4j2 打包使用maven-jar-plugin + maven-assembly-plugin 1.  起因​    公司项目需要添加本地文件存储日志，所以很自然的在log4j2的配置文件中(log4j2-*.xml)添加RollingFile Appe">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/8747d788gy1fp3d6hpzz5j20p106x0tl.jpg">
 
 
 
@@ -129,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="http://www.genericyzh.com/"/>
+  <link rel="canonical" href="http://www.genericyzh.com/springboot/SpringBoot-restart-problem/"/>
 
 
 
 
 
-  <title>genericyzh</title>
+  <title>SpringBoot项目添加日志之后，无限重启 | genericyzh</title>
   
 
 
@@ -160,9 +169,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -245,9 +252,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -277,9 +284,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/springboot/SpringBoot-restart-problem/" itemprop="url">SpringBoot项目添加日志之后，无限重启</a></h1>
+          <h1 class="post-title" itemprop="name headline">SpringBoot项目添加日志之后，无限重启</h1>
         
 
         <div class="post-meta">
@@ -329,9 +334,7 @@
       
 
       
-        
-          
-            <blockquote>
+        <blockquote>
 <p>本篇文章主要叙述遇到这种情况的原因以及解决方法</p>
 </blockquote>
 <p><strong>说明：</strong></p>
@@ -367,8 +370,6 @@
 <li>添加<code>devtools</code>忽略的监听路径/文件：<code>spring.devtools.restart.additional-exclude</code></li>
 </ol>
 
-          
-        
       
     </div>
     
@@ -385,132 +386,28 @@
       
 
       
-
-      
-
       
       
-        <div class="post-eof"></div>
+
       
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.genericyzh.com/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="genericyzh">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="genericyzh">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/hello-world/" itemprop="url">hello world</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-14T00:00:00+08:00">
-                2018-02-14
-              </time>
+              <a href="/hello-world/" rel="next" title="hello world">
+                <i class="fa fa-chevron-left"></i> hello world
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <h1 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h1><p>第一篇循例hello world !!!</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -520,10 +417,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -531,6 +429,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -551,8 +453,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -596,6 +507,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-起因"><span class="nav-text">1.  起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-解决"><span class="nav-text">2. 解决</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -709,10 +636,10 @@
   
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
