@@ -94,13 +94,19 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="genericyzh">
-<meta property="og:url" content="http://www.genericyzh.com/index.html">
+<meta name="description" content="说明： Web容器：tomcat-embed-8.5.16  1. 问题​    项目现场Web服务器被Nginx代理后，Server端通过Request.getRequestUrl()中获得的ServerName为何是客户端发送的域名，而不是Nginx代理后发送的内网ip？ 2. 知识背景2.1 Tomcat使用Facade模式封装Request先看下类的关系：  org.apache.cat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx反向代理后，ServerName最终结果分析">
+<meta property="og:url" content="http://www.genericyzh.com/nginx/nginx-tomcat-problem/index.html">
 <meta property="og:site_name" content="genericyzh">
+<meta property="og:description" content="说明： Web容器：tomcat-embed-8.5.16  1. 问题​    项目现场Web服务器被Nginx代理后，Server端通过Request.getRequestUrl()中获得的ServerName为何是客户端发送的域名，而不是Nginx代理后发送的内网ip？ 2. 知识背景2.1 Tomcat使用Facade模式封装Request先看下类的关系：  org.apache.cat">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://ws1.sinaimg.cn/mw690/8747d788gy1fp7nk2v8cmj213k0xo3zu.jpg">
+<meta property="og:updated_time" content="2018-03-10T07:29:11.516Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="genericyzh">
+<meta name="twitter:title" content="Nginx反向代理后，ServerName最终结果分析">
+<meta name="twitter:description" content="说明： Web容器：tomcat-embed-8.5.16  1. 问题​    项目现场Web服务器被Nginx代理后，Server端通过Request.getRequestUrl()中获得的ServerName为何是客户端发送的域名，而不是Nginx代理后发送的内网ip？ 2. 知识背景2.1 Tomcat使用Facade模式封装Request先看下类的关系：  org.apache.cat">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/mw690/8747d788gy1fp7nk2v8cmj213k0xo3zu.jpg">
 
 
 
@@ -129,13 +135,13 @@
 
 
 
-  <link rel="canonical" href="http://www.genericyzh.com/"/>
+  <link rel="canonical" href="http://www.genericyzh.com/nginx/nginx-tomcat-problem/"/>
 
 
 
 
 
-  <title>genericyzh</title>
+  <title>Nginx反向代理后，ServerName最终结果分析 | genericyzh</title>
   
 
 
@@ -160,9 +166,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -245,9 +249,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -277,9 +281,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/nginx/nginx-tomcat-problem/" itemprop="url">Nginx反向代理后，ServerName最终结果分析</a></h1>
+          <h1 class="post-title" itemprop="name headline">Nginx反向代理后，ServerName最终结果分析</h1>
         
 
         <div class="post-meta">
@@ -329,9 +331,7 @@
       
 
       
-        
-          
-            <blockquote>
+        <blockquote>
 <p>说明：</p>
 <p>Web容器：tomcat-embed-8.5.16</p>
 </blockquote>
@@ -387,8 +387,6 @@
 <li><a href="http://www.6san.com/463/" target="_blank" rel="noopener">http头中的host字段详解</a></li>
 </ol>
 
-          
-        
       
     </div>
     
@@ -405,166 +403,28 @@
       
 
       
-
-      
-
       
       
-        <div class="post-eof"></div>
+
       
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.genericyzh.com/springboot/SpringBoot-restart-problem/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="genericyzh">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="genericyzh">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/springboot/SpringBoot-restart-problem/" itemprop="url">SpringBoot项目添加日志打包后，无限重启</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T00:00:00+08:00">
-                2018-03-05
-              </time>
+              <a href="/springboot/SpringBoot-restart-problem/" rel="next" title="SpringBoot项目添加日志打包后，无限重启">
+                <i class="fa fa-chevron-left"></i> SpringBoot项目添加日志打包后，无限重启
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <blockquote>
-<p>本篇文章主要叙述遇到这种情况的原因以及解决方法</p>
-</blockquote>
-<p><strong>说明：</strong></p>
-<p><strong>项目基于<code>SpringBoot 1.5.9.RELEASE</code>、日志：<code>Slf4j</code>+ <code>log4j2</code></strong></p>
-<p><strong>打包使用<code>maven-jar-plugin</code> + <code>maven-assembly-plugin</code></strong></p>
-<h2 id="1-起因"><a href="#1-起因" class="headerlink" title="1.  起因"></a>1.  起因</h2><p>​    公司项目需要添加本地文件存储日志，所以很自然的在log4j2的配置文件中(<code>log4j2-*.xml</code>)添加<code>RollingFile Appender</code>:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">    <span class="tag">&lt;<span class="name">Appenders</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="tag">&lt;<span class="name">RollingFile</span> <span class="attr">name</span>=<span class="string">"RollingFileInfo"</span> <span class="attr">fileName</span>=<span class="string">"../logs/info.log"</span></span></span><br><span class="line"><span class="tag">                     <span class="attr">filePattern</span>=<span class="string">"../logs/$$&#123;date:yyyy-MM&#125;/info-%d&#123;yyyy-MM-dd&#125;-%i.log"</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">ThresholdFilter</span> <span class="attr">level</span>=<span class="string">"info"</span> <span class="attr">onMatch</span>=<span class="string">"ACCEPT"</span> <span class="attr">onMismatch</span>=<span class="string">"DENY"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">PatternLayout</span> <span class="attr">pattern</span>=<span class="string">"[%d&#123;HH:mm:ss:SSS&#125;] [%p] - %l - %m%n"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">Policies</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">TimeBasedTriggeringPolicy</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">SizeBasedTriggeringPolicy</span> <span class="attr">size</span>=<span class="string">"100 MB"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">Policies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">RollingFile</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="tag">&lt;/<span class="name">Appenders</span>&gt;</span></span><br><span class="line">	...</span><br><span class="line">    <span class="tag">&lt;<span class="name">Loggers</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">root</span> <span class="attr">level</span>=<span class="string">"info"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">AppenderRef</span> <span class="attr">ref</span>=<span class="string">"Console"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">AppenderRef</span> <span class="attr">ref</span>=<span class="string">"RollingFileInfo"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">root</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Loggers</span>&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p><strong>注意：这里选择的日志路径是<code>../logs/...</code>，即当前目录的上一层</strong></p>
-<blockquote>
-<p>补充说明下打包后的目录结构：</p>
-</blockquote>
-<p><img src="https://ws1.sinaimg.cn/large/8747d788gy1fp3d6hpzz5j20p106x0tl.jpg" alt=""></p>
-<p>config目录中：</p>
-<p><img src="https://ws1.sinaimg.cn/large/8747d788gy1fp3ecc0rikj20uw057wf9.jpg" alt=""></p>
-<p>添加成功后，启动bin中的脚本，然后不可思议的一幕发生了：<strong>日志是成功生成了，但是启动成功后，一直重启</strong></p>
-<p><img src="http://7xrjzo.com1.z0.glb.clouddn.com/uploads%2Ffull_emotion%2Femotion_pic%2F10091%2F1-1F622210432.jpg" alt=""></p>
-<p>这时候试过的方法：</p>
-<ul>
-<li style="list-style: none"><input type="checkbox" checked> 换了绝对路径到桌面</li>
-</ul>
-<p>是成功的，启动后不重启了，这时候就怀疑log4j2的<code>RollingFile</code>配置路径只能使用绝对路径？显然并不大可能</p>
-<p>这时候叫来身边的小明帮忙看下…</p>
-<p>半小时过去了…没发现原因</p>
-<p>最后把配置文件发给小明，小明回到工位后一顿乱操作，尝试许久之后，说了一句：是不是日志被修改了，<code>devtools</code>发现文件被修改了，就自动重启了，然后就死循环了…</p>
-<p>于是google下<code>devtools</code>原理：<code>devtools</code>会监听<code>classpath</code>下的文件变动，并且会立即重启应用（发生在保存时机），注册：因为其采用的虚拟机制，重启是很快的。</p>
-<p>这时候再确认下打包的jar中的<code>classpath</code>中配置：</p>
-<p><img src="https://ws1.sinaimg.cn/large/8747d788gy1fp3e9m98jij213t07odh3.jpg" alt=""></p>
-<p>果然把打包后jar包的当前目录加到了<code>classpath</code>中</p>
-<p>到这里其实已经破案了：就是因为打的日志<code>../logs/info.log</code>在<code>classpath</code>下，每次写进日之后，<code>devtools</code>就会触发重启..</p>
-<h2 id="2-解决"><a href="#2-解决" class="headerlink" title="2. 解决"></a>2. 解决</h2><ol>
-<li>日志别输出到<code>classpath</code>中</li>
-<li><del>不使用<code>devtools</code>插件</del></li>
-<li>添加<code>devtools</code>忽略的监听路径/文件：<code>spring.devtools.restart.additional-exclude</code></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -574,130 +434,11 @@
   </article>
 
 
-    
-      
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.genericyzh.com/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="genericyzh">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="genericyzh">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/hello-world/" itemprop="url">hello world</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-14T00:00:00+08:00">
-                2018-02-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h1><p>第一篇循例hello world !!!</p>
-
-          
-        
+    <div class="post-spread">
       
     </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
   </div>
-  
-  
-  
-  </article>
-
-
-    
-  </section>
-
-  
 
 
           </div>
@@ -705,6 +446,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -725,8 +470,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -770,6 +524,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-问题"><span class="nav-text">1. 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-知识背景"><span class="nav-text">2. 知识背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Tomcat使用Facade模式封装Request"><span class="nav-text">2.1 Tomcat使用Facade模式封装Request</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Nginx配置说明"><span class="nav-text">2.2 Nginx配置说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-问题分析"><span class="nav-text">3. 问题分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-结论"><span class="nav-text">4. 结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-参考资源"><span class="nav-text">5. 参考资源</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -883,10 +653,10 @@
   
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
