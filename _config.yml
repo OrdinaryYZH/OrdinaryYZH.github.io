@@ -80,3 +80,7 @@ deploy:
   type: git
   repo: git@github.com:genericyzh/genericyzh.github.io.git
   branch: master
+
+# 自动生成sitemap
+sitemap: 
+  path: sitemap.xml
