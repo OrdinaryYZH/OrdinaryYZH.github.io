@@ -7,16 +7,34 @@ toc: true
 
 ## _01_RotateArray
 
+> 时间：2017/12/28、2018/01/30、2018/03/12
+
 > 题意：给出一个数组，将其向右移动k位，并返回
 
-> 时间：2017/12/28、2018/01/30
-
 ```java
-class Solution {
-    public void rotate(int[] nums, int k) {
-        
+public void rotate(int[] nums, int k) {
+        if (nums == null) {
+            throw new NullPointerException("数组不能为空");
+        }
+        int length = nums.length;
+        k %= length;
+        if (k == 0) {
+            return;
+        }
+        reverse(nums, 0, length - 1);
+        reverse(nums, 0, k - 1);
+        reverse(nums, k, length - 1);
     }
-}
+
+    public static void reverse(int[] nums, int left, int right) {
+        while (left < right) {
+            int temp = nums[left];
+            nums[left] = nums[right];
+            nums[right] = temp;
+            left++;
+            right--;
+        }
+    }
 ```
 
 1. 方法一：先整体翻转，再将两部分各自翻转即可
@@ -25,6 +43,38 @@ class Solution {
 
 2. 自己计算每次要移动的下标，总共移动了`nums.length`次之后，就成功了
 
+   ```java
+   /**
+    * 方法2：自己计算每次要移动的下标，总共移动了nums.length次之后，就成功了
+    * 这是一种纯操作的方式
+    *
+    * @param nums
+    * @param k
+    */
+   public void rotate2(int[] nums, int k) {
+       if (nums == null) {
+           throw new NullPointerException("数组不能为空");
+       }
+       k = k % nums.length;
+       if (k == 0) {
+           return;
+       }
+       int count = 0;
+       for (int start = 0; count < nums.length; start++) {
+           int currentIndex = start;
+           int curVal = nums[start];
+           do {
+               int nextIndex = (currentIndex + k) % nums.length;
+               int nextVal = nums[nextIndex];
+               nums[nextIndex] = curVal;
+               curVal = nextVal;
+               currentIndex = nextIndex;
+               count++;
+           } while (currentIndex != start); // 有可能形成环,有环的情况下要跳出，不然会死循环
+       }
+   }
+   ```
+
 
 ---
 
@@ -32,21 +82,53 @@ class Solution {
 
 ## _02_Contains_Duplicate
 
-> 给出一个数组，判断是否有重复元素
+> 时间：2018/01/31、2018/03/12
 
-> 时间：2018/01/31
+> 题意：给出一个数组，判断是否有重复元素
+1. 快排，循环判断
+
+
 ```java
-class Solution {
-    public boolean containsDuplicate(int[] nums) {
-        
+public boolean containsDuplicate2(int[] nums) {
+    Arrays.sort(nums);
+    for (int ind = 1; ind < nums.length; ind++) {
+        if (nums[ind] == nums[ind - 1]) {
+            return true;
+        }
     }
+    return false;
 }
 ```
 
-1. 快排，循环判断
-2. 使用Set
+1. 使用Set
    1. contains判断
+
+   ```java
+   public static boolean containsDuplicate3(int[] nums) {
+       final Set<Integer> distinct = new HashSet<>();
+       for (int num : nums) {
+           if (distinct.contains(num)) {
+               return true;
+           }
+           distinct.add(num);
+       }
+       return false;
+   }
+   ```
+
    2. 或者根据add()返回值判断；true：没添加过
+
+   ```java
+   public static boolean containsDuplicate4(int[] nums) {
+       Set<Integer> set = new HashSet<>();
+       for (int i : nums) {
+           if (!set.add(i)) {
+               return true;
+           }
+       }
+       return false;
+   }
+   ```
 
 
 ---
@@ -55,9 +137,9 @@ class Solution {
 
 ## _03_Find_Peak_Element
 
-> 给定一个左右相邻不相等的数组，找出一个局部最大值。PS：num[-1]=num[n]=-∞
+> 时间：2018/01/31、2018/03/13
 
-> 时间：2018/01/31
+> 题意：给定一个左右相邻不相等的数组，找出一个局部最大值。PS：num[-1]=num[n]=-∞
 
 ```java
 class Solution {
@@ -81,6 +163,7 @@ class Solution {
 ```
 
 * 二分法；
+  * why：复杂度低，$log_2N$，根据mid跟mid+1可以排除一半 
 * 每次筛选的区间，[left ~ mid] 或者 [mid+1 ~ right]
   ![](https://ws1.sinaimg.cn/large/8747d788ly1fnzvbs27oqj212d0b7aaa.jpg)
 * 结束的条件：left == right
@@ -95,14 +178,14 @@ class Solution {
 
 ## _04_Maximum_Subarray 
 
-> 求给出数组最长连续子序列之和
+> 时间：2018/02/09、2018/03/13
 
-> 时间：2018/02/09
+> 题意：求给出数组最长连续子序列之和
 
 > 分析：注意要连续
 
 ```java
-public int maxSubArray(int[] nums) {
+	public int maxSubArray(int[] nums) {
         int length = nums.length;
         int dp = nums[0];
         int max = dp;
@@ -115,13 +198,17 @@ public int maxSubArray(int[] nums) {
     }
 ```
 
+图解：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fpbb7eiholj21ff0jhjse.jpg)
+
 ---
 
 ## _05_KthLargestElementinanArray
 
-> 在数组中找到第k大的元素
+> 时间：2018/02/14、2018/03/13
 
-> 时间：2018/02/14
+> 题意：在数组中找到第k大的元素
 
 > 分析：几种解法： 
 >
@@ -169,21 +256,22 @@ public int maxSubArray(int[] nums) {
 
 复杂度：
 
-| 最坏时间复杂度 | О(*n*2) |
-| ------- | ------- |
-| 最优时间复杂度 | О(*n*)  |
-| 平均时间复杂度 | O(*n*)  |
-| 空间复杂度   | O(*1*)  |
+| 最坏时间复杂度 | О(*n*2) e.g.已排好序的(降序)，找最后一个，n + (n - 1)+ (n - 2) + ... + 1 |
+| ------- | ---------------------------------------- |
+| 最优时间复杂度 | О(*n*)                                   |
+| 平均时间复杂度 | O(*n*)                                   |
+| 空间复杂度   | O(*1*)                                   |
 
 ---
 
 ## _06_FindAllDuplicatesinanArray
 
-> 给出一个数组: 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once. // 有些出现2次，有些出现1次;
+> 时间：2018/02/14、2018/03/13
+>
+
+> 题意：给出一个数组: 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once. // 有些出现2次，有些出现1次;
 >
 > Find all the elements that appear twice in this array. // 找出出现2次的数字
-
-> 时间：2018/02/14
 
 > 分析：因为1 ≤ a[i] ≤ n，可以用数组解决（如果a[i]是int就难搞了）；将每次出现的a[a[i]]变相反数，那么第二次判断的时候，就能知道出现第二次了
 
@@ -207,7 +295,7 @@ public int maxSubArray(int[] nums) {
 
 ## _07_MaxIncreasingSubsequence
 
-> 时间：2018/02/14
+> 时间：2018/02/14、2018/03/13
 
 > 给出一个未排序的数组，求出最长增长子序列(不连续)长度
 >
@@ -257,6 +345,10 @@ public int lengthOfLIS(int[] nums) {
 }
 ```
 
+图例：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fpbij5d0ymj21dh0xjtb2.jpg)
+
 debug流程：
 
 1. nums：![](https://ws1.sinaimg.cn/large/8747d788gy1foh7sc8jvmj20mf01fa9y.jpg)
@@ -303,7 +395,7 @@ public int lengthOfLIS2(int[] nums) {
 
 ## _08_RotateImage
 
-> 时间：2018/02/15
+> 时间：2018/02/15、2018/03/14
 
 > 给出一个二维数组，将其顺时针翻转90度
 
@@ -334,11 +426,15 @@ public void rotate(int[][] matrix) {
 }
 ```
 
+图解：
+
+![](https://ws1.sinaimg.cn/large/8747d788ly1fpc5eqhvr5j212b0rsdh3.jpg)
+
 ---
 
 ## _09_ShuffleanArray
 
-> 时间：2018/02/15
+> 时间：2018/02/15、2018/03/15
 
 > 题意：给出一个int数组，设计算法让其打乱（等概率）；[题目](https://leetcode.com/problems/shuffle-an-array/#/description)
 
@@ -404,7 +500,7 @@ public static void shuffleCard(int[] cards) {
 
 ## _10_FindMinimuminRotatedSortedArray
 
-> 时间：2018/02/15
+> 时间：2018/02/15、2018/03/15
 
 > 题目：给出一个旋转之后的数组（有序），找出其最小值
 
@@ -454,7 +550,32 @@ private int minInOrder(int[] nums, int indexL, int indexR) {
 }
 ```
 
+注意：
+
+while结束条件：
+```java
+if (indexR - indexL == 1) {
+  result = indexR;
+  break;
+}
+```
+
+**L跟R相差1！！！**
+
+如何做到？以下判断条件：**都不是+1 / -1，保证mid永远在上面或者永远在下面**
+
+```Java
+    if (nums[indexMid] >= nums[indexL]) {
+        indexL = indexMid;
+    } else {
+        indexR = indexMid;
+    }
+```
+
+
  图解：
+
+
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1fohk6nvz1dj20ib0fodhk.jpg)
 
@@ -465,7 +586,7 @@ private int minInOrder(int[] nums, int indexL, int indexR) {
 
 ## _11_SearchinRotatedSortedArray
 
-> 时间：2018/02/16
+> 时间：2018/02/16、2018/03/15
 
 > 题意：给出一个"旋转"过的有序数组，找出target，有则返回其下标，否则返回-1
 
