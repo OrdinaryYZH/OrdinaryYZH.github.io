@@ -2,7 +2,7 @@
 
 ### _01_LinkedList
 
-> 时间：2018/02/21
+> 时间：2018/02/21、2018/03/15
 
 > 题意：实现单向链表
 
@@ -78,7 +78,7 @@ public class _01_LinkedList<E> {
 
 ### _02_DoublyLinkedList
 
-> 时间： 2018/02/21
+> 时间： 2018/02/21、2018/03/15
 
 > 题意：实现双向链表
 
@@ -181,11 +181,13 @@ public class _02_DoublyLinkedList<E> {
 
 ### _04_PalindromeLinkedList
 
-> 时间： 2018/02/22
+> 时间： 2018/02/22、2018/03/15
 
 > 题意：给一个单向链表，判断是否是回文，最好是O(n) time and O(1) space
 
-> 分析：先得到链表长度，再利用递归的特性：栈中存head的next，全局存rightNode，从中间向两边判断
+> 分析：
+>
+> 解法一：先得到链表长度，再利用递归的特性：栈中存head的next，全局存rightNode，从中间向两边判断
 
 ```java
 public class _04_PalindromeLinkedList {
@@ -226,11 +228,53 @@ public class _04_PalindromeLinkedList {
 }
 ```
 
+解法二：使用快速指针遍历，同时慢指针遍历的时候把方向改变了；然后再从中间到两边对比
+
+```java
+public boolean isPalindrome2(ListNode head) {
+    if (head == null || head.next == null) {
+        return true;
+    }
+
+    ListNode slow = head;
+    ListNode fast = head;
+    ListNode pre = null;
+    while (fast != null && fast.next != null) {
+        fast = fast.next.next;
+        ListNode next = slow.next;
+        slow.next = pre;
+        pre = slow;
+        slow = next;
+    }
+
+    if (fast != null) { // odd
+        fast = slow.next;
+        slow = pre;
+    } else { // even
+        fast = slow;
+        slow = pre;
+    }
+
+    while (fast != null) {
+        if (fast.val != slow.val) {
+            return false;
+        }
+        fast = fast.next;
+        slow = slow.next;
+    }
+    return true;
+}
+```
+
+图例：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fpds0qvkebj21760rujtr.jpg)
+
 ---
 
 ### _05_ReverseLinkedList
 
-> 时间：2018/02/22
+> 时间：2018/02/22、2018/03/15
 
 > 题意：翻转单向链表
 
@@ -287,11 +331,15 @@ public ListNode reverseList2(ListNode head) {
 }
 ```
 
+图例：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fpds0dpzggj211m0ci0th.jpg)
+
 ---
 
 ### _06_IntersectionofTwoLinkedLists
 
-> 时间：2018/02/22
+> 时间：2018/02/22、2018/03/15
 
 > 题意：给出两个单向链表，他们有可能后面部分完全重合，找出重合的节点
 >
@@ -374,6 +422,12 @@ private int getLinkedListSize(ListNode listNode) {
 
 ---
 
+解法2分析：
+
+* 会死循环？
+  不会，a = a.next，直接赋值，没有条件判断a.next ！= null ，所以a会指到null；
+  当两个链表不相交时，a跟b都会为null，循环结束，返回null
+
 ```java
 /**
  * 解法2：
@@ -402,7 +456,7 @@ public ListNode getIntersectionNode2(ListNode headA, ListNode headB) {
 
 ### _07_LinkedListCycle
 
-> 时间：2018/02/22
+> 时间：2018/02/22、2018/03/15
 
 > 题意：判断单向链表是否有环
 
@@ -436,9 +490,9 @@ public boolean hasCycle(ListNode head) {
 
 ---
 
-### _08_RemoveNthNodeFromEndofList
+### _08_RemoveNthNodeFromEndOfList
 
-> 时间：2018/02/22
+> 时间：2018/02/22、2018/03/15
 
 > 题意：删除单向链表的倒数第n个节点
 
@@ -520,11 +574,15 @@ private void remove(ListNode x) {
 }
 ```
 
+图例：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fpdrzplmryj212c0j4jsr.jpg)
+
 ---
 
 ### _09_SortList
 
-> 时间：2018/02/22
+> 时间：2018/02/22、2018/03/15
 
 > 题意：合并两个已排序的单向链表
 
@@ -620,7 +678,7 @@ public ListNode mergeTwoLists2(ListNode l1, ListNode l2) {
 
 ### _10_LinkedListCycle2
 
-> 时间：2018/02/22
+> 时间：2018/02/22、2018/03/15
 
 > 题意：给出一个单向链表，如果有环，返回环的开始节点，没有环的话：返回null
 
@@ -736,6 +794,8 @@ ListNode findLink(ListNode x, ListNode y) {
 ```
 
 图解：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fpdrzeclp5j20tk0t3407.jpg)
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1foparhsee6j20wg0m6wft.jpg)
 
