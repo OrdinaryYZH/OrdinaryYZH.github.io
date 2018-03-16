@@ -496,6 +496,28 @@ public static void shuffleCard(int[] cards) {
 }
 ```
 
+Fisher–Yates_shuffle算法：
+
+| Range | Roll |           Scratch | Result            |
+| ----- | ---- | ----------------: | ----------------- |
+|       |      |   1 2 3 4 5 6 7 8 |                   |
+| 1–8   | 6    | 1 2 3 4 5 **8** 7 | **6**             |
+| 1–7   | 2    |   1 **7** 3 4 5 8 | **2** 6           |
+| 1–6   | 6    |         1 7 3 4 5 | **8** 2 6         |
+| 1–5   | 1    |       **5** 7 3 4 | **1** 8 2 6       |
+| 1–4   | 3    |         5 7 **4** | **3** 1 8 2 6     |
+| 1–3   | 3    |               5 7 | **4** 3 1 8 2 6   |
+| 1–2   | 1    |             **7** | **5** 4 3 1 8 2 6 |
+
+```python
+def sattoloCycle(items):
+    i = len(items)
+    while i > 1:
+        i = i - 1
+        j = randrange(i)  # 0 <= j <= i-1
+        items[j], items[i] = items[i], items[j]
+```
+
 ---
 
 ## _10_FindMinimuminRotatedSortedArray
