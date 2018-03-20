@@ -32,8 +32,8 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
 
 1. key的最小下标 
 
-2. ```java
-   public static int searchFirstEqual(int[] arr, int key) {
+    ```java
+    public static int searchFirstEqual(int[] arr, int key) {
        int length = arr.length;
        int left = 0, right = length - 1;
        while (left < right)//根据两指针的意义，如果key存在于数组，left==right相等时已经得到解
@@ -46,7 +46,7 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
                //一定在mid位置的右边，并且不包括当前mid位置
                left = mid + 1;
            } else {
-               //故意写得和参考博文不一样，下面有证明
+               // 只能确定<=mid（因为求最小下标，如果最大下标，就是>=mid）
                right = mid;
            }
        }
@@ -54,8 +54,9 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
            return left;
        }
        return -1;
-   }
-   ```
+    }
+    ```
+
 
 2. 找出最后一个与key相等的元素的位置
 
@@ -69,7 +70,7 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
                right = mid - 1;
            } else if (arr[mid] < key) {//key一定在mid位置的右边，相等时答案有可能是当前mid位置
                left = mid + 1;
-           } else {//故意写得和参考博客不一样，见下面证明
+           } else {
                left = mid;
            }
        }
@@ -83,7 +84,7 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
    }
    ```
 
-3. 查找第一个等于或者大于Key的元素的位置
+3. 查找第一个>=Key的元素的位置
 
    ```java
    public static int searchFirstEqualOrLarger(int[] arr, int key) {
@@ -103,7 +104,7 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
    }
    ```
 
-4. 查找第一个大于key的元素的位置
+4. 查找第一个>key的元素的位置
 
    ```java
    public static int searchFirstLarger(int[] arr, int key) {
@@ -111,17 +112,24 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
        int left = 0, right = length - 1;
        while (left <= right) {
            int mid = (left + right) / 2;
+           // 这里可能mid-1减多了，可能mid-1就是key的下标，但是后面left+1会加回来，而且循环条件是left <= right
            if (arr[mid] > key) {
                right = mid - 1;
            } else if (arr[mid] <= key) {
                left = mid + 1;
            }
        }
-       return left;
+       if (left >= arr.length) {
+           return -1;
+       }
+       if (arr[left] > key) {
+           return left;
+       }
+       return -1;
    }
    ```
 
-5. 查找最后一个等于或者小于key的元素的位置
+5. 查找最后一个<=key的元素的位置
 
    ```java
    public static int searchLastEqualOrSmaller(int[] arr, int key) {
@@ -131,7 +139,11 @@ public static int binary_search(int[] arr, int start, int end, int khey) {
            int m = (left + right) / 2;
            if (arr[m] > key) {
                right = m - 1;
-           } else if (arr[m] <= key) {
+           } else if (arr[m] < key) {
+           // 这里有可能加多了，+1之后，可能arr[left]>=key;
+           // 但是加多了之后，right会减回来，如果不存在相等情况，那么最后right会在left的左边，最后返回right即系答案
+           left = m + 1;
+           } else {
                left = m + 1;
            }
        }
