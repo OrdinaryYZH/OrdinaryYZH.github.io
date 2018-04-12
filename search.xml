@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[Nginx反向代理后，ServerName最终结果分析]]></title>
+    <url>%2Fnginx%2Fnginx-tomcat-problem%2F</url>
+    <content type="text"><![CDATA[说明： Web容器：tomcat-embed-8.5.16 1. 问题​ 项目现场Web服务器被Nginx代理后，Server端通过Request.getRequestUrl()中获得的ServerName为何是客户端发送的域名，而不是Nginx代理后发送的内网ip？ 2. 知识背景2.1 Tomcat使用Facade模式封装Request先看下类的关系： org.apache.catalina.connector.Request类，封装了org.apache.coyote.Request类，实现了HttpServletRequest接口，已经具备了实际使用能力，不过它还包含了很多Catalina的方法，这些方法不应该暴露给应用层，以免引起与其他容器实现的兼容性问题。 org.apache.catalina.connector.RequestFacade类实现了HttpServletRequest接口，并在其中包含了一个org.apache.catalina.connector.Request对象，将所有HttpServletRequest接口的调用，都代理给org.apache.catalina.connector.Request对象来处理，这样就屏蔽了Catalina的相关的内部方法，使用户可以专注于servlet的标准方法。 2.2 Nginx配置说明 参考：http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_set_header Syntax: proxy_set_header field value; Default: proxy_set_header Host $proxy_host; proxy_set_header Connection close; Context: http, server, location 1proxy_set_header Host $http_host; However, if this field is not present in a client request header then nothing will be passed. 所以配置$http_host就是用来传递客户端的Host头的 3. 问题分析有了以上背景之后，就可以很容易的分析出该问题的原因了。 因为tomcat中实际处理的是org.apache.catalina.connector.Request，所以看下getRequestURL()是如何处理的： 123456789101112131415161718192021222324@Overridepublic StringBuffer getRequestURL() &#123; StringBuffer url = new StringBuffer(); String scheme = getScheme(); int port = getServerPort(); if (port &lt; 0) &#123; port = 80; // Work around java.net.URL bug &#125; url.append(scheme); url.append("://"); // 获取ServerName url.append(getServerName()); if ((scheme.equals("http") &amp;&amp; (port != 80)) || (scheme.equals("https") &amp;&amp; (port != 443))) &#123; url.append(':'); url.append(port); &#125; url.append(getRequestURI()); return url;&#125; 再看下getServerName() 1234567/** * @return the server name responding to this Request. */@Overridepublic String getServerName() &#123; return coyoteRequest.serverName().toString();&#125; 继续进入org.apache.coyote.Request#serverName() 12345678910/** * Get the "virtual host", derived from the Host: header associated with * this request. * * @return The buffer holding the server name, if any. Use isNull() to check * if there is no value set. */public MessageBytes serverName() &#123; return serverNameMB;&#125; 从注释中可以看到，serverName()拿的是Host请求头 Nginx中的配置应该是proxy_set_header Host $http_host;，（PS：为什么说应该？因为是客户现场配置的Nginx，无法直接查看配置；而且从程序中获得的requestUrl以及Nginx的默认配置说明中推测出来） 4. 结论所以说程序中request.getRequestUrl()后获得的url中的serverName是由Host-Header决定的， 而我们的Web服务器经过了Nginx代理，Nginx中配置了proxy_set_header Host $http_host,所以最终获得的还是客户端的serverName，而不是Nginx服务器的内网ip。 5. 参考资源 HTTP头字段 Tomcat为什么要使用Facde模式对Request对象进行包装？ HTTP 请求头中的 X-Forwarded-For http头中的host字段详解]]></content>
+      <categories>
+        <category>server</category>
+      </categories>
+      <tags>
+        <tag>springboot</tag>
+        <tag>nginx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[SpringBoot项目添加日志打包后，无限重启]]></title>
+    <url>%2Fspringboot%2FSpringBoot-restart-problem%2F</url>
+    <content type="text"><![CDATA[本篇文章主要叙述遇到这种情况的原因以及解决方法 说明： 项目基于SpringBoot 1.5.9.RELEASE、日志：Slf4j+ log4j2 打包使用maven-jar-plugin + maven-assembly-plugin 1. 起因​ 公司项目需要添加本地文件存储日志，所以很自然的在log4j2的配置文件中(log4j2-*.xml)添加RollingFile Appender: 1234567891011121314151617181920212223... &lt;Appenders&gt; ... &lt;RollingFile name="RollingFileInfo" fileName="../logs/info.log" filePattern="../logs/$$&#123;date:yyyy-MM&#125;/info-%d&#123;yyyy-MM-dd&#125;-%i.log"&gt; &lt;!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）--&gt; &lt;ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/&gt; &lt;PatternLayout pattern="[%d&#123;HH:mm:ss:SSS&#125;] [%p] - %l - %m%n"/&gt; &lt;Policies&gt; &lt;TimeBasedTriggeringPolicy/&gt; &lt;SizeBasedTriggeringPolicy size="100 MB"/&gt; &lt;/Policies&gt; &lt;/RollingFile&gt; ... &lt;/Appenders&gt; ... &lt;Loggers&gt; &lt;root level="info"&gt; &lt;AppenderRef ref="Console"/&gt; &lt;AppenderRef ref="RollingFileInfo"/&gt; &lt;/root&gt; &lt;/Loggers&gt;... 注意：这里选择的日志路径是../logs/...，即当前目录的上一层 补充说明下打包后的目录结构： config目录中： 添加成功后，启动bin中的脚本，然后不可思议的一幕发生了：日志是成功生成了，但是启动成功后，一直重启 这时候试过的方法： 换了绝对路径到桌面 是成功的，启动后不重启了，这时候就怀疑log4j2的RollingFile配置路径只能使用绝对路径？显然并不大可能 这时候叫来身边的小明帮忙看下… 半小时过去了…没发现原因 最后把配置文件发给小明，小明回到工位后一顿乱操作，尝试许久之后，说了一句：是不是日志被修改了，devtools发现文件被修改了，就自动重启了，然后就死循环了… 于是google下devtools原理：devtools会监听classpath下的文件变动，并且会立即重启应用（发生在保存时机），注册：因为其采用的虚拟机制，重启是很快的。 这时候再确认下打包的jar中的classpath中配置： 果然把打包后jar包的当前目录加到了classpath中 到这里其实已经破案了：就是因为打的日志../logs/info.log在classpath下，每次写进日之后，devtools就会触发重启.. 2. 解决 日志别输出到classpath中 不使用devtools插件 添加devtools忽略的监听路径/文件：spring.devtools.restart.additional-exclude]]></content>
+      <categories>
+        <category>springboot</category>
+      </categories>
+      <tags>
+        <tag>springboot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[hello world]]></title>
+    <url>%2Fhello-world%2F</url>
+    <content type="text"><![CDATA[hello world第一篇循例hello world !!!]]></content>
+  </entry>
+</search>
