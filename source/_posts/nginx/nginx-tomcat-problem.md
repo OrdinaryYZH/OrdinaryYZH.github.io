@@ -2,6 +2,11 @@
 title: Nginx反向代理后，ServerName最终结果分析
 date: 2018-3-8 00:00:00
 toc: true
+categories: 
+- server
+tags:
+- springboot
+- nginx
 ---
 
 > 说明：

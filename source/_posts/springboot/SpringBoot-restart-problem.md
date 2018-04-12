@@ -2,6 +2,10 @@
 title: SpringBoot项目添加日志打包后，无限重启
 date: 2018-3-5 00:00:00
 toc: true
+categories: 
+- springboot
+tags:
+- springboot
 ---
 
 > 本篇文章主要叙述遇到这种情况的原因以及解决方法
