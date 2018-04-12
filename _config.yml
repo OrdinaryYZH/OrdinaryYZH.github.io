@@ -84,3 +84,30 @@ deploy:
 # 自动生成sitemap
 sitemap: 
   path: sitemap.xml
+
+# 头像
+avatar: https://avatars3.githubusercontent.com/u/10287222
+
+# Social links
+social:
+  GitHub: https://github.com/genericyzh
+  Weibo: http://weibo.com/genericyzh
+
+# title, chinese available
+links_title: 友链
+# links
+links:
+  明年今日: https://zhich.github.io/
+
+# 搜索
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
+
+# 评论
+disqus:
+  enable: true
+  shortname: genericyzh
+  count: true
