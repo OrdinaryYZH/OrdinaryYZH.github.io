@@ -7,7 +7,7 @@ toc: true
 
 ## _01_RotateArray
 
-> 时间：2017/12/28、2018/01/30、2018/03/12
+> 时间：2017/12/28、2018/01/30、2018/03/12、2018/04/15
 
 > 题意：给出一个数组，将其向右移动k位，并返回
 
@@ -82,7 +82,7 @@ public void rotate(int[] nums, int k) {
 
 ## _02_Contains_Duplicate
 
-> 时间：2018/01/31、2018/03/12
+> 时间：2018/01/31、2018/03/12、2018/04/15
 
 > 题意：给出一个数组，判断是否有重复元素
 1. 快排，循环判断
@@ -100,7 +100,7 @@ public boolean containsDuplicate2(int[] nums) {
 }
 ```
 
-1. 使用Set
+2. 使用Set
    1. contains判断
 
    ```java
@@ -137,7 +137,7 @@ public boolean containsDuplicate2(int[] nums) {
 
 ## _03_Find_Peak_Element
 
-> 时间：2018/01/31、2018/03/13
+> 时间：2018/01/31、2018/03/13、2018/04/15
 
 > 题意：给定一个左右相邻不相等的数组，找出一个局部最大值。PS：num[-1]=num[n]=-∞
 
@@ -178,7 +178,7 @@ class Solution {
 
 ## _04_Maximum_Subarray 
 
-> 时间：2018/02/09、2018/03/13
+> 时间：2018/02/09、2018/03/13、2018/04/15
 
 > 题意：求给出数组最长连续子序列之和
 
@@ -190,7 +190,7 @@ class Solution {
         int dp = nums[0];
         int max = dp;
         for (int i = 1; i < length; i++) {
-            int temp = nums[i] + (dp > 0 ? dp : 0); // 因为要连续，所以nums[i]时一定要加的
+            int temp = nums[i] + (dp > 0 ? dp : 0); // 因为要连续，所以nums[i]是一定要加的
             dp = temp;
             max = Math.max(temp, max);
         }
@@ -206,7 +206,7 @@ class Solution {
 
 ## _05_KthLargestElementinanArray
 
-> 时间：2018/02/14、2018/03/13
+> 时间：2018/02/14、2018/03/13、2018/04/15
 
 > 题意：在数组中找到第k大的元素
 
@@ -266,7 +266,7 @@ class Solution {
 
 ## _06_FindAllDuplicatesinanArray
 
-> 时间：2018/02/14、2018/03/13
+> 时间：2018/02/14、2018/03/13、2018/04/15
 >
 
 > 题意：给出一个数组: 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once. // 有些出现2次，有些出现1次;
@@ -395,7 +395,7 @@ public int lengthOfLIS2(int[] nums) {
 
 ## _08_RotateImage
 
-> 时间：2018/02/15、2018/03/14
+> 时间：2018/02/15、2018/03/14、2018/04/15
 
 > 给出一个二维数组，将其顺时针翻转90度
 
@@ -434,7 +434,7 @@ public void rotate(int[][] matrix) {
 
 ## _09_ShuffleanArray
 
-> 时间：2018/02/15、2018/03/15
+> 时间：2018/02/15、2018/03/15、2018/04/15
 
 > 题意：给出一个int数组，设计算法让其打乱（等概率）；[题目](https://leetcode.com/problems/shuffle-an-array/#/description)
 
@@ -522,7 +522,7 @@ def sattoloCycle(items):
 
 ## _10_FindMinimuminRotatedSortedArray
 
-> 时间：2018/02/15、2018/03/15
+> 时间：2018/02/15、2018/03/15、2018/04/15
 
 > 题目：给出一个旋转之后的数组（有序），找出其最小值
 
@@ -608,7 +608,7 @@ if (indexR - indexL == 1) {
 
 ## _11_SearchinRotatedSortedArray
 
-> 时间：2018/02/16、2018/03/15
+> 时间：2018/02/16、2018/03/15、2018/04/15
 
 > 题意：给出一个"旋转"过的有序数组，找出target，有则返回其下标，否则返回-1
 
