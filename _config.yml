@@ -106,8 +106,3 @@ search:
   format: html
   limit: 10000
 
-# 评论
-disqus:
-  enable: true
-  shortname: genericyzh
-  count: true
