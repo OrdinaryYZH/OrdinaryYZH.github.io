@@ -2,7 +2,7 @@
 
 ### _01_LinkedList
 
-> 时间：2018/02/21、2018/03/15
+> 时间：2018/02/21、2018/03/15、2018/04/16
 
 > 题意：实现单向链表
 
@@ -78,7 +78,7 @@ public class _01_LinkedList<E> {
 
 ### _02_DoublyLinkedList
 
-> 时间： 2018/02/21、2018/03/15
+> 时间： 2018/02/21、2018/03/15、2018/04/19
 
 > 题意：实现双向链表
 
@@ -181,7 +181,7 @@ public class _02_DoublyLinkedList<E> {
 
 ### _04_PalindromeLinkedList
 
-> 时间： 2018/02/22、2018/03/15
+> 时间： 2018/02/22、2018/03/15、2018/04/19
 
 > 题意：给一个单向链表，判断是否是回文，最好是O(n) time and O(1) space
 
@@ -274,7 +274,7 @@ public boolean isPalindrome2(ListNode head) {
 
 ### _05_ReverseLinkedList
 
-> 时间：2018/02/22、2018/03/15
+> 时间：2018/02/22、2018/03/15、2018/04/20
 
 > 题意：翻转单向链表
 
@@ -339,7 +339,7 @@ public ListNode reverseList2(ListNode head) {
 
 ### _06_IntersectionofTwoLinkedLists
 
-> 时间：2018/02/22、2018/03/15
+> 时间：2018/02/22、2018/03/15、2018/04/20
 
 > 题意：给出两个单向链表，他们有可能后面部分完全重合，找出重合的节点
 >
@@ -456,7 +456,7 @@ public ListNode getIntersectionNode2(ListNode headA, ListNode headB) {
 
 ### _07_LinkedListCycle
 
-> 时间：2018/02/22、2018/03/15
+> 时间：2018/02/22、2018/03/15、2018/04/20
 
 > 题意：判断单向链表是否有环
 
@@ -492,7 +492,7 @@ public boolean hasCycle(ListNode head) {
 
 ### _08_RemoveNthNodeFromEndOfList
 
-> 时间：2018/02/22、2018/03/15
+> 时间：2018/02/22、2018/03/15、2018/04/20
 
 > 题意：删除单向链表的倒数第n个节点
 
@@ -582,7 +582,7 @@ private void remove(ListNode x) {
 
 ### _09_SortList
 
-> 时间：2018/02/22、2018/03/15
+> 时间：2018/02/22、2018/03/15、2018/04/20
 
 > 题意：合并两个已排序的单向链表
 
@@ -678,7 +678,7 @@ public ListNode mergeTwoLists2(ListNode l1, ListNode l2) {
 
 ### _10_LinkedListCycle2
 
-> 时间：2018/02/22、2018/03/15
+> 时间：2018/02/22、2018/03/15、2018/04/20
 
 > 题意：给出一个单向链表，如果有环，返回环的开始节点，没有环的话：返回null
 
@@ -744,7 +744,7 @@ public ListNode detectCycle(ListNode head) {
 
 ---
 
-> 分析2：不同之处是找相交点即可( 参考：_06_IntersectionofTwoLinkedLists)，* 不用通过推算得出结论，slow从head开始；如果是解法1的话，slow需要从head.next开始才行
+> 分析2：不同之处是找相交点即可( 参考：_06_IntersectionofTwoLinkedLists)，不用通过推算得出结论，slow从head开始；如果是解法1的话，slow需要从head.next开始才行
 
 ```java
 /**
@@ -769,6 +769,9 @@ public ListNode detectCycle2(ListNode head) {
         }
         slow = slow.next;
         fast = fast.next.next;
+    }
+    if(slow == null){
+      return null;
     }
     ListNode temp = slow.next;
     slow.next = null;// break the link
@@ -803,7 +806,7 @@ ListNode findLink(ListNode x, ListNode y) {
 
 ### _11_MergekSortedLists
 
-> 时间：2018/02/22、2018/03/15
+> 时间：2018/02/22、2018/03/15、2018/04/20
 
 > 题意：合并k个已排序的链表
 
