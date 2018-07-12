@@ -1,5 +1,3 @@
-
-
 # BinaryTree
 
 ## 总结
@@ -17,11 +15,11 @@
 
 ---
 
-
+## 遍历
 
 ### _01_BinaryTreeLevelOrderTraversal
 
-> 时间：2018/02/23
+> 时间：2018/02/23、2018/04/23
 
 > 题意：给出一颗二叉树，输出每一层的节点
 
@@ -60,7 +58,7 @@ public List<List<Integer>> levelOrder(TreeNode root) {
 
 ### _02_SumofLeftLeaves
 
-> 时间：2018/02/23
+> 时间：2018/02/23、2018/04/23
 
 > 题意：给出一个二叉树，求其"左叶子节点"之和
 >
@@ -203,9 +201,11 @@ public class _02_SumofLeftLeaves {
 
 ### _03_InvertBinaryTree
 
-> 时间：2018/02/24
+> 时间：2018/02/24、2018/04/23
 
 > 题意：翻转二叉树
+
+> 分析：遍历每个节点，交换left和right即可
 
 ```java
 /**
@@ -253,6 +253,12 @@ public TreeNode invertTree2(TreeNode root) {
     }
     return root;
 }
+
+private void swap(TreeNode node) {
+    TreeNode temp = node.left;
+    node.left = node.right;
+    node.right = temp;
+}
 ```
 
 一样的题目：[二叉树的镜像](https://www.nowcoder.com/practice/564f4c26aa584921bc75623e48ca3011?tpId=13&tqId=11171&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
@@ -277,7 +283,7 @@ public class Solution {
 
 ### _04_BSTIterator
 
-> 时间：2018/02/24
+> 时间：2018/02/24、2018/04/23
 
 > 题意：给出一个二叉搜索树，设计一个迭代器，包含以下两个方法：
 >
@@ -293,7 +299,9 @@ public class Solution {
 > * 若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；
 > * 任意节点的左、右子树也分别为二叉查找树；
 > ```
-> 明显的中序遍历
+> 明显的中序遍历；
+>
+> 用栈做辅助
 
 ```java
 public class _04_BSTIterator {
@@ -317,10 +325,10 @@ public class _04_BSTIterator {
      */
     public int next() {
         while (cur != null) {
-            stack.offerLast(cur);
+            stack.push(cur);
             cur = cur.left;
         }
-        TreeNode temp = stack.pollLast();
+        TreeNode temp = stack.pop();
         cur = temp.right;
         return temp.val;
     }
@@ -335,7 +343,7 @@ public class _04_BSTIterator {
 
 ### _05_PostOrderTraversalTree
 
-> 时间：2018/02/24
+> 时间：2018/02/24、2018/04/23
 
 > 题意：返回后序遍历(【左右根】)的节点val数组
 
@@ -369,6 +377,7 @@ public class _05_PostOrderTraversalTree {
     /**
      * 非递归写法:
      * 用栈和集合辅助
+     * 存在的问题：如果存在重复的TreeNode，那么就会有问题
      *
      * @param root
      * @return
@@ -457,7 +466,7 @@ public class _05_PostOrderTraversalTree {
     }
 
     /**
-     * 解法3，因为要返回的是【左右根】，我们可以用发现先序遍历的时候可以做到【根右左】，所以再把它reverse一下就得到答案了
+     * 解法4，因为要返回的是【左右根】，我们可以用发现先序遍历的时候可以做到【根右左】，所以再把它reverse一下就得到答案了
      *
      * @param root
      * @return
@@ -494,7 +503,7 @@ public class _05_PostOrderTraversalTree {
 
 ### _06_BinaryTreePreorderTraversal
 
-> 时间：2018/02/24
+> 时间：2018/02/24、2018/04/23
 
 > 题意：给出一个二叉树，返回先序遍历（【根左右】）数组
 
@@ -563,7 +572,7 @@ public class _06_BinaryTreePreorderTraversal {
 
 ### _07_FlattenBinaryTreetoLinkedList
 
-> 时间：2018/02/25
+> 时间：2018/02/25、2018/04/24
 
 > 题意：Given
 >
@@ -635,6 +644,7 @@ public class _07_FlattenBinaryTreetoLinkedList {
 
     /**
      * 解法2，递归，先右后左 + 变量辅助
+     * 左节点用到右节点、中节点用到左节点
      *
      * @param root
      */
@@ -664,7 +674,7 @@ public class _07_FlattenBinaryTreetoLinkedList {
 
         TreeNode cur = root;
         while (cur != null) {
-            // 不断的将左子树放到根与右子树之间
+            // 不断的将左子树放到根与右子树之间，一层层的放
             if (cur.left != null) {
                 TreeNode temp = cur.left;
                 while (temp.right != null) {
@@ -685,7 +695,7 @@ public class _07_FlattenBinaryTreetoLinkedList {
 
 ### _08_SymmetricTree
 
-> 时间：2018/02/25
+> 时间：2018/02/25、2018/04/24
 
 > 题意：判断二叉树是否是对称
 >
@@ -712,11 +722,11 @@ public class _07_FlattenBinaryTreetoLinkedList {
 
 > 分析：
 >
-> 1、递归；向两边递归，使用两个参数
+> 1、递归；向两边递归，使用两个参数，一层层的判断
 >
-> 2、非递归：BFS + 回文判断
+> 2、非递归：BFS + 回文判断，一层层的判断
 >
-> 3、非递归：使用两个队列模拟递归
+> 3、非递归：使用两个队列模拟递归，一层层的判断
 
 ```java
 public class _08_SymmetricTree {
@@ -746,6 +756,31 @@ public class _08_SymmetricTree {
         boolean con3 = check(left.right, right.left);
         return con1 & con2 & con3;
     }
+    
+    /**
+    * 以下为return的时机不同，会快一点，但是上面的方法易读点
+    */
+    private boolean check(TreeNode left, TreeNode right) {
+        if (left == null && right == null) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        boolean con1 = left.val == right.val ? true : false;
+        if (con1 == false) {
+            return false;
+        }
+        boolean con2 = check(left.left, right.right);
+        if (con2 == false) {
+            return false;
+        }
+        boolean con3 = check(left.right, right.left);
+        if (con3 == false) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * 非递归：BFS + 回文判断
@@ -762,7 +797,6 @@ public class _08_SymmetricTree {
         }
         Deque<TreeNode> queue = new ArrayDeque<>();
         List<Integer> list = new ArrayList<>();
-        List<Integer> list2;
         queue.offer(root);
         while (!queue.isEmpty()) {
             list.clear();
@@ -787,20 +821,18 @@ public class _08_SymmetricTree {
                     list.add(treeNode.right.val);
                 }
             }
-//            Integer[] integers = Arrays.<Integer, Integer>copyOf(list.toArray(new Integer[list.size()]), list.size(), Integer[].class);
-            list2 = new ArrayList<>(Collections.nCopies(list.size(), 0));
-            Collections.copy(list2, list);
-            Collections.reverse(list2);
-            boolean flag = Objects.deepEquals(list, list2);
-            if (flag == false) {
-                return false;
+            for (int i = 0; i <= (list.size() - 1) / 2; i++) {
+                if (!list.get(i).equals(list.get(list.size() - 1 - i))) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
     /**
-     * 非递归，用两个队列辅助
+     * 非递归，使用两个队列模拟递归
+     * 一层层的判断
      *
      * @param root
      * @return
@@ -852,7 +884,7 @@ public class _08_SymmetricTree {
 
 ### _09_BinaryTreeInorderTraversal
 
-> 时间：2018/02/26
+> 时间：2018/02/26、2018/04/24
 
 > 题意：返回二叉树中序遍历节点数组，不包括null
 >
@@ -930,13 +962,11 @@ void inOrder(TreeNode x, List<Integer> list) {
 
 ### _10_SameTree
 
-> 时间：2018/02/26
+> 时间：2018/02/26、2018/04/24
 
 > 题意：判断两棵二叉树是否一样
 
 > 分析：跟判断二叉树对称差不多，递归判断
-
-
 
 ```java
 public boolean isSameTree(TreeNode p, TreeNode q) {
@@ -981,7 +1011,7 @@ public boolean isSameTree(TreeNode p, TreeNode q) {
 
 ### _11_MaximumDepthofBinaryTree
 
-> 时间：2018/02/26
+> 时间：2018/02/26、2018/04/24
 
 > 题意：求二叉树的深度
 
@@ -989,7 +1019,7 @@ public boolean isSameTree(TreeNode p, TreeNode q) {
 >
 > 1、不用额外变量可否？
 >
-> 2、不信定义方法可否？
+> 2、不自定义方法可否？
 >
 > 可以的
 
@@ -1008,7 +1038,7 @@ public int maxDepth(TreeNode root) {
 
 ### _12_BalancedBinaryTree
 
-> 时间：2018/02/26
+> 时间：2018/02/26、2018/04/24
 
 > 题意：判断二叉树是否是平衡二叉树（它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树）
 >
@@ -1080,7 +1110,7 @@ private int maxDepth(TreeNode root) {
 
 ### _13_MinimumDepthofBinaryTree
 
-> 时间：2018/02/26
+> 时间：2018/02/26、2018/04/24
 
 > 题意：求二叉树最浅深度(跟叶子节点最接近的距离)
 
@@ -1116,7 +1146,7 @@ public int minDepth(TreeNode root) {
 
 ### _14_ConvertSortedListtoBinarySearchTree
 
-> 时间：2018/02/27
+> 时间：2018/02/27、2018/04/24
 
 > 题意：给出一个升序的链表，返回一个高度平衡的搜索树
 >
@@ -1177,7 +1207,7 @@ private TreeNode build(ListNode start, ListNode end) {
 
 ### _15_ValidateBinarySearchTree
 
-> 时间：2018/02/27
+> 时间：2018/02/27、2018/04/25
 
 > 题意：给出一个二叉树，判断是否是搜索树
 
@@ -1242,11 +1272,17 @@ private boolean check(TreeNode root, long low, long high) {
     if (root.left != null) {
         check = check(root.left, low, root.val);
     }
+    if (check == false) {
+        return false;
+    }
     boolean check2 = true;
     if (root.right != null) {
         check2 = check(root.right, root.val, high);
     }
-    return check & check2;
+    if (check2 == false) {
+        return false;
+    }
+    return true;
 }
 ```
 
@@ -1276,7 +1312,7 @@ public boolean isValidBST3(TreeNode root) {
 
 ### _16_ConvertSortedArraytoBinarySearchTree
 
-> 时间：2018/02/27
+> 时间：2018/02/27、2018/04/26
 
 > 题意：给出一个升序数组，构造出BST（二叉搜索树）
 >
@@ -1322,11 +1358,13 @@ private TreeNode buildBST(int[] nums, int l, int r) {
 
 ### _17_KthSmallestElementinaBST
 
-> 时间：2018/02/28
+> 时间：2018/02/28、2018/04/26
 
 > 题意：求搜索二叉树的第k个节点值
 
 > 分析：
+>
+> 中序遍历
 >
 > 1、递归，要用全局变量辅助
 >
@@ -1385,7 +1423,7 @@ public int kthSmallest3(TreeNode root, int k) {
 
 ### _18_ZigZagOrderLevelTraversalBST
 
-> 时间：2018/02/28
+> 时间：2018/02/28、2018/04/26
 
 > 题意：Given binary tree `[3,9,20,null,null,15,7]`,
 >
@@ -1452,7 +1490,7 @@ public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
 
 ### _19_DeleteNodeinaBST
 
-> 时间：2018/02/28
+> 时间：2018/02/28、2018/04/26
 
 > 题意：BST中删除指定节点
 
@@ -1558,9 +1596,9 @@ private TreeNode findMin(TreeNode node) {
 
 ### _20_LowestCommonAncestorBST
 
-> 时间：2018/03/01
+> 时间：2018/03/01、2018/04/26
 
-> 题意：求BST的LCA（最小公共祖先）
+> 题意：求BST的LCA（Lowest Common Ancestor最近公共祖先）
 
 > 分析：
 >
@@ -1615,7 +1653,7 @@ public TreeNode lowestCommonAncestor3(TreeNode root, TreeNode p, TreeNode q) {
 
 ### _22_BinaryTreeRightSideView
 
-> 时间：2018/03/01
+> 时间：2018/03/01、2018/04/26
 
 > 题意：求二叉树的右侧节点列表
 
@@ -1701,15 +1739,15 @@ private void helper(TreeNode root, int current, List<Integer> lst) {
 
 ### _23_FindModeInBST
 
-> 时间：2018/03/01
+> 时间：2018/03/01、2018/04/26
 
-> 题意：在一棵存在重复的搜索树中，找出出现次数最多的节点
+> 题意：在一棵存在重复的搜索树中，找出出现次数最多的节点（可能有多个）
 
 > 分析：
 >
 > 方法一：利用搜索树特性，用中序遍历；需要遍历两次，第一次确定出现的最多次数，第二次根据第一次遍历知道的最大值添加答案
 >
-> 方法二：使用hashmap
+> 方法二：使用HashMap
 
 ```java
 int maxCount = 0;
@@ -1826,13 +1864,13 @@ private void find(TreeNode root, Map<Integer, Integer> map) {
 
 ### _24_MostFrequentSubtreeSum
 
-> 时间：2018/03/09
+> 时间：2018/03/09、2018/04/26
 
 > 题意：给出一个二叉树，求子树的和中，出现最多的和次数最多的是哪些
 
 > 分析：
 >
-> 推理条件：n各节点，对应n颗子树；
+> 推理条件：n个节点，对应n颗子树；
 >
 > 后序遍历 + hashMap
 >
@@ -1878,7 +1916,7 @@ private int getSum(TreeNode root, Map<Integer, Integer> map) {
 
 ### _25_FindLargestElementinEachRow
 
-> 时间：2018/03/11
+> 时间：2018/03/11、2018/04/26
 
 > 题意：给出一个二叉树，返回每一行的最大节点val
 
@@ -1944,13 +1982,11 @@ private void helper(TreeNode root, List<Integer> res, int depth) {
 
 
 
-
-
 ---
 
 ### _26_SerializeAndDeserializeBST
 
-> 时间：2018/03/11
+> 时间：2018/03/11、2018/04/26
 
 > 题意：给出一颗搜索树，设计序列化，反序列化方法
 
@@ -2025,13 +2061,11 @@ public class _26_SerializeAndDeserializeBST {
 
 
 
-
-
 ---
 
 ### _27_SerializeAndDeserializeBT
 
-> 时间：2018/03/11
+> 时间：2018/03/11、2018/04/26
 
 > 题意：设计二叉树的序列化跟反序列化方法
 
@@ -2165,7 +2199,7 @@ TreeNode getNode(String s) {
 
 ### _28_LowestCommonAncestorofaBinaryTree
 
-> 时间：2018/03/01
+> 时间：2018/03/01、2018/04/26
 
 > 题意：求二叉树LCA
 
