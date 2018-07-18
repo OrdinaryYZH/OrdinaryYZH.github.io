@@ -4,7 +4,7 @@
 
 ApplicationContext 继承自 BeanFactory，但是它不应该被理解为 BeanFactory 的实现类，而是说其内部持有一个实例化的 BeanFactory（DefaultListableBeanFactory）。以后所有的 BeanFactory 相关的操作其实是给这个实例来处理的
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1fpsk0pdh60j20wm0nd42m.jpg)
+![](http://ww1.sinaimg.cn/large/8747d788gy1fte1530negj220s1gnhdt.jpg)
 
 ##### 2. Spring IOC的原理？
 
@@ -29,6 +29,8 @@ ApplicationContext 继承自 BeanFactory，但是它不应该被理解为 BeanFa
    * NEVER
 
    [一图学习 Spring事务传播性](http://yhzhtk.info/2014/06/17/mindmap-transaction-propagation.html)
+
+![](http://ww1.sinaimg.cn/large/8747d788gy1ftc4qecxaqj22a713h1kx.jpg)
 
 ##### 3. Spring Aop的原理
    动态代理，实现方式有JDK动态代理和CGLIB
