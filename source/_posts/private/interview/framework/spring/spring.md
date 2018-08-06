@@ -35,6 +35,17 @@ ApplicationContext 继承自 BeanFactory，但是它不应该被理解为 BeanFa
 ##### 3. Spring Aop的原理
    动态代理，实现方式有JDK动态代理和CGLIB
 
+
+
+##### 4. Spring MVC
+
+1. Web项目启动流程，Listener + servlet 配置的作用
+2. 请求流程
+
+
+
+
+
 ## 其他
 
 ##### 1. Spring常用的注解
