@@ -182,5 +182,139 @@ String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getN
 
 
 
+### 9.4 DispatcherServlet
+
+onRefresh()是DispatcherServlet的入口方法。因为在FrameworkServlet中注册了Listener，所以在wac刷新后发布刷新事件时，该方法被调用。
+
+FrameworkServlet中：
+
+```java
+private class ContextRefreshListener implements ApplicationListener<ContextRefreshedEvent> {
+
+   @Override
+   public void onApplicationEvent(ContextRefreshedEvent event) {
+      FrameworkServlet.this.onApplicationEvent(event);
+   }
+}
+```
+
+```java
+public void onApplicationEvent(ContextRefreshedEvent event) {
+   this.refreshEventReceived = true;
+   onRefresh(event.getApplicationContext());
+}
+```
+
+---
+
+DispatcherServlet：
+
+```java
+@Override
+protected void onRefresh(ApplicationContext context) {
+   initStrategies(context);
+}
+```
+
+```java
+protected void initStrategies(ApplicationContext context) {
+   initMultipartResolver(context);
+   initLocaleResolver(context);
+   initThemeResolver(context);
+   initHandlerMappings(context);
+   initHandlerAdapters(context);
+   initHandlerExceptionResolvers(context);
+   initRequestToViewNameTranslator(context);
+   initViewResolvers(context);
+   initFlashMapManager(context);
+}
+```
+
+initStrategies中调用了9个初始化方法。
+
+下面以LocalResolver为例分析初始化方法：
+
+```java
+private void initLocaleResolver(ApplicationContext context) {
+   try {
+      this.localeResolver = context.getBean(LOCALE_RESOLVER_BEAN_NAME, LocaleResolver.class);
+      if (logger.isDebugEnabled()) {
+         logger.debug("Using LocaleResolver [" + this.localeResolver + "]");
+      }
+   }
+   catch (NoSuchBeanDefinitionException ex) {
+      // We need to use the default.
+      this.localeResolver = getDefaultStrategy(context, LocaleResolver.class);
+      if (logger.isDebugEnabled()) {
+         logger.debug("Unable to locate LocaleResolver with name '" + LOCALE_RESOLVER_BEAN_NAME +
+               "': using default [" + this.localeResolver + "]");
+      }
+   }
+}
+```
+
+在wac中找不到时，则使用默认组件
+
+默认的组件配置在DispatcherServlet所在的包DispatcherServlet.properties文件下配置了：
+
+```properties
+# Default implementation classes for DispatcherServlet's strategy interfaces.
+# Used as fallback when no matching beans are found in the DispatcherServlet context.
+# Not meant to be customized by application developers.
+
+org.springframework.web.servlet.LocaleResolver=org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver
+
+org.springframework.web.servlet.ThemeResolver=org.springframework.web.servlet.theme.FixedThemeResolver
+
+org.springframework.web.servlet.HandlerMapping=org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping,\
+   org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping
+
+org.springframework.web.servlet.HandlerAdapter=org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter,\
+   org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter,\
+   org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter
+
+org.springframework.web.servlet.HandlerExceptionResolver=org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver,\
+   org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver,\
+   org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver
+
+org.springframework.web.servlet.RequestToViewNameTranslator=org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator
+
+org.springframework.web.servlet.ViewResolver=org.springframework.web.servlet.view.InternalResourceViewResolver
+
+org.springframework.web.servlet.FlashMapManager=org.springframework.web.servlet.support.SessionFlashMapManager
+```
+
+这里定义了8个组件，少了处理上传的组件。（**所以如果使用上传功能的话需要引入相关的组件**）
+
+多知道点：在spring的xml文件中通过命名空间配置的标签时怎么解析的？（略）
+
+
+
+### 9.5 小结
+
+主要分析了Spring MVC自身的创建过程，Spring MVC中的Servlet一共有三个层次，分别是HttpServletBean、FrameworkServlet和DispatcherServlet。
+
+* HttpServletBean直接继承自HttpServlet，它将Servlet中的配置参数设置到相应的属性
+* FrameworkServlet初始化了WebApplicationContext
+* DispatcherServlet初始化了自身的9个组件
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
