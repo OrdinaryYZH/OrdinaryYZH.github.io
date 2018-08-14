@@ -250,19 +250,7 @@ object encoding hello
 
 ### 2.2 字符串
 
-#### 2.2.1 字符串键值结构
-
-可以是字符串、数字或者二进制
-最大容量512MB
-
-#### 2.2.2 场景
-
-1. 缓存
-2. 计数器
-3. 分布式锁/共享Session
-4. 限速
-
-#### 2.2.3 API
+#### 2.2.1 API
 
 ##### 1. 常用命令
 
@@ -334,37 +322,115 @@ n次get和1次get多个对比：
 
 ###### (1) 追加值
 
->  可以向字符串尾部追加值
->
-> `append key value `
+可以向字符串尾部追加值
+
+`append key value `
 
 ###### (2) 字符串长度
 
+`strlen key`
+
+redisworld：返回10
+
+世界：返回6（每个中文占用3个字节）
+
 ###### (3) 设置并返回原值
+
+`getset key value`：getset和set一样会设置值，但是getset会返回键原来的值
+
+```shell
+> getset hello world
+(nil)
+> getset hello redis
+"world"
+```
 
 ###### (4) 设置指定位置的字符
 
+`setrange key offeset value`
+
+```shell
+> set redis pest
+OK
+> setrange redis 0 b
+4
+> get redis
+"best"
+```
+
 ###### (5) 获取部分字符串
 
-##### 5. 查漏补缺
+`getrange key start end`：偏移量从0开始
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frqg3201zlj21uz0sp1kx.jpg)
+```shell
+> getrange redis 0 1
+"be"
+```
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frqg3zd1iuj21dy10m1kx.jpg)
+##### 3. 时间复杂度
 
-##### 6. increbyfloat getrange setrange
+![](http://ww1.sinaimg.cn/large/8747d788gy1fu9ijx1p7zj21kw0vonb3.jpg)
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frqg5sh18rj21wf0t11kx.jpg)
+#### 2.2.2 内部编码
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frqg8g4i4bj21gq11c1kx.jpg)
+> 可以是字符串、数字或者二进制
+> 最大容量512MB
+>
+> 字符串类型的内部编码有3种：
+>
+> - int：8个字节的长整型。
+> - embstr：小于等于39个字节的字符串。
+> - raw：大于39个字节的字符串。
+>
+> Redis会根据当前值的类型和长度决定使用哪种内部编码实现。
+> 整数类型示例如下：
 
-#### 5. 时间复杂度
+```shell
+127.0.0.1:6379> set key 8653
+OK
+127.0.0.1:6379> object encoding key
+"int"
+```
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrbivjc0zj21sw0utay6.jpg)
+短字符串示例如下：
 
-### 5. hash
+小于等于39个字节的字符串：embstr
 
-#### 5.1 哈希键值结构
+```shell
+127.0.0.1:6379> set key "hello,world"
+OK
+127.0.0.1:6379> object encoding key
+"embstr"
+```
+
+长字符串示例如下：
+
+大于39个字节的字符串：raw
+
+```shell
+127.0.0.1:6379> set key "one string greater than 39 byte........."
+OK
+127.0.0.1:6379> object encoding key
+"raw"
+127.0.0.1:6379> strlen key
+(integer) 40
+86
+```
+
+
+
+#### 2.2.3 场景
+
+1. 缓存
+2. 计数器
+3. 分布式锁/共享Session
+4. 限速
+
+
+
+### 3. hash
+
+#### 3.1 哈希键值结构
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrcajetczj21tl0in456.jpg)
 
@@ -372,7 +438,7 @@ n次get和1次get多个对比：
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrcb9ptopj21gz0tpwpt.jpg)
 
-#### 5.2 API
+#### 3.2 API
 
 ##### 1. hget hste hdel
 
@@ -407,7 +473,7 @@ n次get和1次get多个对比：
 
 注意：小心使用`hgetall`，可能key中存了1万+条，看情况适用`hmget`命令
 
-#### 5.3 string vs hash
+#### 3.3 string vs hash
 
 ##### 1. 相似的API
 
@@ -437,17 +503,17 @@ n次get和1次get多个对比：
 
 
 
-### 6. list
+### 4. list
 
-#### 6.1列表结构
+#### 4.1列表结构
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrhxit3s6j225x0t1dpc.jpg)
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrk2uvvbsj22680uxk1g.jpg)
 
-#### 6.2 重要的API
+#### 4.2 重要的API
 
-##### 6.2.1 增（rpush、lpush、linsert）
+##### 4.2.1 增（rpush、lpush、linsert）
 
 1. rpush
    ![](https://ws1.sinaimg.cn/large/8747d788gy1frrk6ayrmkj21xh0qzk5w.jpg)
@@ -456,7 +522,7 @@ n次get和1次get多个对比：
 3. linsert
    ![](https://ws1.sinaimg.cn/large/8747d788gy1frrk8tw8fjj22590ulnk2.jpg)
 
-##### 6.2.2 删（lpop、rpop、lrem ）
+##### 4.2.2 删（lpop、rpop、lrem ）
 
 1. lpop
    ![](https://ws1.sinaimg.cn/large/8747d788gy1frrkaw7ewjj21xt0ztds0.jpg)
@@ -470,29 +536,29 @@ n次get和1次get多个对比：
 4. ltrim
    ![](https://ws1.sinaimg.cn/large/8747d788gy1frrkptxgewj21z91k81d0.jpg)
 
- ##### 6.2.3 查（lrange）
+ ##### 4.2.3 查（lrange）
 
-   ###### 6.3.1 lrange
+   ###### 4.3.1 lrange
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrksycggwj21ze1hp7st.jpg)
 
-###### 6.3.2 lindex
+###### 4.3.2 lindex
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrl2pmjl9j21xr11gh1d.jpg)
 
-###### 6.3.3 llen![](https://ws1.sinaimg.cn/large/8747d788gy1frrl3mt73fj21xc13jqe3.jpg)
+###### 4.3.3 llen![](https://ws1.sinaimg.cn/large/8747d788gy1frrl3mt73fj21xc13jqe3.jpg)
 
-##### 6.2.4 改
+##### 4.2.4 改
 
-###### 6.4.1 lset
+###### 4.4.1 lset
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrl9tdlx9j21ym10zney.jpg)
 
-#### 6.3 实战-TimeLine
+#### 4.3 实战-TimeLine
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrlcnwf2vj223814eh2v.jpg)
 
-#### 6.4 查漏补缺（blpop、brpop）
+#### 4.4 查漏补缺（blpop、brpop）
 
 > 它是 [LPOP](http://redisdoc.com/list/lpop.html#lpop) 命令的阻塞版本，当给定列表内没有任何元素可供弹出的时候，连接将被 [BLPOP](http://redisdoc.com/list/blpop.html#blpop) 命令阻塞，直到等待超时或发现可弹出元素为止。
 >
@@ -500,7 +566,7 @@ n次get和1次get多个对比：
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrle5ufccj21v40xr4qp.jpg)
 
-#### 6.5 Tips（命令组合使用组成不同的数据结构）
+#### 4.5 Tips（命令组合使用组成不同的数据结构）
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frrlexmn5uj21p50kgn5s.jpg)
 
@@ -508,89 +574,89 @@ n次get和1次get多个对比：
 
 
 
-### 7. set
+### 5. set
 
-#### 7.1 集合结构
+#### 5.1 集合结构
 
-##### 7.1.1 图解
+##### 5.1.1 图解
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs83fvavcj21j80ueqdb.jpg)
 
-##### 7.1.2 特点
+##### 5.1.2 特点
 
 1. 无序
 2. 无重复
 3. 集合间操作
 
-#### 7.2 集合内API
+#### 5.2 集合内API
 
-##### 7.2.1 sadd srem
+##### 5.2.1 sadd srem
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs87bnhzgj21x70w2hcf.jpg)
 
-##### 7.2.2 scard sismember srandmember smembers
+##### 5.2.2 scard sismember srandmember smembers
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8awwtwnj2215161hdt.jpg)
 
 > 注意：smembers 集合太大小心使用
 
-#### 7.3 实战
+#### 5.3 实战
 
-##### 7.3.1 抽奖系统
+##### 5.3.1 抽奖系统
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8ikpgfcj21fw0fv46a.jpg)
 
-##### 7.3.2 Like、赞、踩
+##### 5.3.2 Like、赞、踩
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8j7c2u6j21sf0px7hw.jpg)
 
-##### 7.3.3 标签（tag）
+##### 5.3.3 标签（tag）
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8klangoj22650u1tz4.jpg)
 
-#### 7.4 集合间API(sdiff sinter sunion)
+#### 5.4 集合间API(sdiff sinter sunion)
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8mx4wjjj21xp157e81.jpg)
 
-##### 7.4.1 例子：共同关注
+##### 5.4.1 例子：共同关注
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8nwa6jwj20te1337i6.jpg)
 
-#### 7.5 TIPS
+#### 5.5 TIPS
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8qay6vxj21ip0fptfv.jpg)
 
 
 
-### 8. zset（有序集合）
+### 6. zset（有序集合）
 
-#### 8.1 有序集合结构
+#### 6.1 有序集合结构
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs8t1wpxtj21wp11ak7r.jpg)
 
-#### 8.2 API
+#### 6.2 API
 
-##### 8.2.1 zadd
+##### 6.2.1 zadd
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs9hx761sj21yb16e7su.jpg)
 
-##### 8.2.2 zrem
+##### 6.2.2 zrem
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs9miavfvj21z5169ker.jpg)
 
-##### 8.2.3 zscore
+##### 6.2.3 zscore
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs9p6hsqzj21yg16iavn.jpg)
 
-##### 8.2.4 zincrby
+##### 6.2.4 zincrby
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs9qwvranj21y61737vb.jpg)
 
-##### 8.2.5 zcard
+##### 6.2.5 zcard
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frs9zg9ti0j21zr16s1dq.jpg)
 
-##### 8.2.6 zrank
+##### 6.2.6 zrank
 
 `ZRANK key member `
 
@@ -599,41 +665,41 @@ redis> ZRANK salary tom                     # 显示 tom 的薪水排名，第�
 (integer) 1
 ```
 
-##### 8.2.7 demo
+##### 6.2.7 demo
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsa119rk6j21od18mkjl.jpg)
 
-##### 8.2.8 zrange
+##### 6.2.8 zrange
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsa20hjkqj2203132qtl.jpg)
 
-##### 8.2.9 zrangebyscore
+##### 6.2.9 zrangebyscore
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsa3t5hqxj220j13h7wh.jpg)
 
-##### 8.2.10 zcount
+##### 6.2.10 zcount
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsa4m4210j220d13k1kx.jpg)
 
-##### 8.2.11 zremrangebyrank
+##### 6.2.11 zremrangebyrank
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsa7jv1l3j220l13w1kx.jpg)
 
-##### 8.2.12 zremrangebyscore
+##### 6.2.12 zremrangebyscore
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsa8eox2hj220g13r1kx.jpg)
 
-##### 8.2.13 demo
+##### 6.2.13 demo
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsa9fhf2oj21jq18ohdt.jpg)
 
-#### 8.3 实战 - 排行榜
+#### 6.3 实战 - 排行榜
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsacovfxlj21sh1434qp.jpg)
 
-#### 8.4 查漏补缺（zrevrank、zrevrange、zrevrangebyscore、zinterstore、zunionstore）
+#### 6.4 查漏补缺（zrevrank、zrevrange、zrevrangebyscore、zinterstore、zunionstore）
 
-#### 8.5 总结
+#### 6.5 总结
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1frsam5sklij217410ye0c.jpg)
 
