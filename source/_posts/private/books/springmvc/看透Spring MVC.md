@@ -1,4 +1,4 @@
-## 第九章 创建Spring MVC之器
+## 第9章 创建Spring MVC之器
 
 ### 9.1 整体结构介绍
 
@@ -8,7 +8,7 @@
 
 知识点：
 
-1. **XXXAware的作用**(Spring提供XXX给Bean)：如果在某个类里面想要使用spring的一些东西，实现该接口后，spring就会把想要的东西注入，接收的方式是实现set-XXX方法 
+1. **XXXAware的作用**(Spring提供XXX给Bean)：如果在某个类里面想要使用spring的一些东西，实现该接口后，spring就会把想要的东西注入，接收的方式是实现set-XXX方法 ；ApplicationContextAwareProcessor实现该项工作，`AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsBeforeInitialization` 方法会遍历PostProcessor。
 2. **EnvironmentCapable的作用**？(Bean提供Environment给Spring)  实现该接口的类代表其能够提供Environment，方法为：getEnvironment()
 3. **Environment都有啥**？(HttpServletBean中Environment使用的是Standard-Servlet-Environment)
    * ServletContext **ServletContextPropertySource** 
@@ -124,32 +124,58 @@ protected final void initServletBean() throws ServletException {
 代码如下：
 
 ```java
-@Override
-protected final void initServletBean() throws ServletException {
-   getServletContext().log("Initializing Spring FrameworkServlet '" + getServletName() + "'");
-   if (this.logger.isInfoEnabled()) {
-      this.logger.info("FrameworkServlet '" + getServletName() + "': initialization started");
-   }
-   long startTime = System.currentTimeMillis();
+protected WebApplicationContext initWebApplicationContext() {
+    WebApplicationContext rootContext =
+            WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+    WebApplicationContext wac = null;
 
-   try {
-      this.webApplicationContext = initWebApplicationContext();
-      initFrameworkServlet();
-   }
-   catch (ServletException ex) {
-      this.logger.error("Context initialization failed", ex);
-      throw ex;
-   }
-   catch (RuntimeException ex) {
-      this.logger.error("Context initialization failed", ex);
-      throw ex;
-   }
+    if (this.webApplicationContext != null) {
+        // A context instance was injected at construction time -> use it
+        wac = this.webApplicationContext;
+        if (wac instanceof ConfigurableWebApplicationContext) {
+            ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) wac;
+            if (!cwac.isActive()) {
+                // The context has not yet been refreshed -> provide services such as
+                // setting the parent context, setting the application context id, etc
+                if (cwac.getParent() == null) {
+                    // The context instance was injected without an explicit parent -> set
+                    // the root application context (if any; may be null) as the parent
+                    cwac.setParent(rootContext);
+                }
+                configureAndRefreshWebApplicationContext(cwac);
+            }
+        }
+    }
+    if (wac == null) {
+        // No context instance was injected at construction time -> see if one
+        // has been registered in the servlet context. If one exists, it is assumed
+        // that the parent context (if any) has already been set and that the
+        // user has performed any initialization such as setting the context id
+        wac = findWebApplicationContext();
+    }
+    if (wac == null) {
+        // No context instance is defined for this servlet -> create a local one
+        wac = createWebApplicationContext(rootContext);
+    }
 
-   if (this.logger.isInfoEnabled()) {
-      long elapsedTime = System.currentTimeMillis() - startTime;
-      this.logger.info("FrameworkServlet '" + getServletName() + "': initialization completed in " +
-            elapsedTime + " ms");
-   }
+    if (!this.refreshEventReceived) {
+        // Either the context is not a ConfigurableApplicationContext with refresh
+        // support or the context injected at construction time had already been
+        // refreshed -> trigger initial onRefresh manually here.
+        onRefresh(wac);
+    }
+
+    if (this.publishContext) {
+        // Publish the context as a servlet context attribute.
+        String attrName = getServletContextAttributeName();
+        getServletContext().setAttribute(attrName, wac);
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Published WebApplicationContext of servlet '" + getServletName() +
+                    "' as ServletContext attribute with name [" + attrName + "]");
+        }
+    }
+
+    return wac;
 }
 ```
 
@@ -189,6 +215,73 @@ String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getN
    具体方法是：`FrameworkServlet#createWebApplicationContext(WebApplicationContext xx)`
    内部调用了：`configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac)`
    知识点：ApplicationListener机制
+
+   createWebApplicationContext(ApplicationContext parent)：
+
+   ```java
+   protected WebApplicationContext createWebApplicationContext(ApplicationContext parent) {
+       Class<?> contextClass = getContextClass();
+       if (this.logger.isDebugEnabled()) {
+           this.logger.debug("Servlet with name '" + getServletName() +
+                   "' will try to create custom WebApplicationContext context of class '" +
+                   contextClass.getName() + "'" + ", using parent context [" + parent + "]");
+       }
+       if (!ConfigurableWebApplicationContext.class.isAssignableFrom(contextClass)) {
+           throw new ApplicationContextException(
+                   "Fatal initialization error in servlet with name '" + getServletName() +
+                   "': custom WebApplicationContext class [" + contextClass.getName() +
+                   "] is not of type ConfigurableWebApplicationContext");
+       }
+       ConfigurableWebApplicationContext wac =
+               (ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
+   
+       wac.setEnvironment(getEnvironment());
+       wac.setParent(parent);
+       wac.setConfigLocation(getContextConfigLocation());
+   
+       configureAndRefreshWebApplicationContext(wac);
+   
+       return wac;
+   }
+   ```
+
+   configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac)：
+
+   ```java
+   protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac) {
+       if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
+           // The application context id is still set to its original default value
+           // -> assign a more useful id based on available information
+           if (this.contextId != null) {
+               wac.setId(this.contextId);
+           }
+           else {
+               // Generate default id...
+               wac.setId(ConfigurableWebApplicationContext.APPLICATION_CONTEXT_ID_PREFIX +
+                       ObjectUtils.getDisplayString(getServletContext().getContextPath()) + '/' + getServletName());
+           }
+       }
+   
+       wac.setServletContext(getServletContext());
+       wac.setServletConfig(getServletConfig());
+       wac.setNamespace(getNamespace());
+       wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));	// 添加listener(一个内部类实现了ApplicationListener接口)
+   
+       // The wac environment's #initPropertySources will be called in any case when the context
+       // is refreshed; do it eagerly here to ensure servlet property sources are in place for
+       // use in any post-processing or initialization that occurs below prior to #refresh
+       ConfigurableEnvironment env = wac.getEnvironment();
+       if (env instanceof ConfigurableWebEnvironment) {
+           ((ConfigurableWebEnvironment) env).initPropertySources(getServletContext(), getServletConfig());
+       }
+   
+       postProcessWebApplicationContext(wac);
+       applyInitializers(wac);
+       wac.refresh();
+   }
+   ```
+
+   
 
 ##### 3. 将webApplicationContext设置到ServletContext中
 
@@ -444,7 +537,7 @@ protected final void processRequest(HttpServletRequest request, HttpServletRespo
     initContextHolders(request, localeContext, requestAttributes);
 
     try {
-        doService(request, response);
+ --→    doService(request, response);
     }
     catch (ServletException ex) {
         failureCause = ex;
@@ -492,7 +585,7 @@ DispatcherServlet中的入口方法是doService()，但是核心处理是doDispa
 
 1. 判断是否include请求，是则对request的Attribute做快照备份，等doDispatch()处理完之后（如果不是异步调用且未完成？）进行还原
 2. 对request设置一些属性，前面4个在之后介绍的handler和view中需要使用，后面3个都和flashMap有关，主要用于Redirect转法时参数的传递
-   1. webApplication
+   1. webApplicationContext
    2. localeResolver
    3. themeResolver
    4. themeSource
@@ -561,7 +654,7 @@ protected void doService(HttpServletRequest request, HttpServletResponse respons
 1. 使用RequestContextHolder，写法太复杂..
 
    ```java
-   1. ((FlashMap) ((ServletRequestAttributes) (RequestContextHolder.getRequestAttributes())).getRequest().getAttribute(DispatcherServlet.OUTPUT_FLASH_MAP_ATTRIBUTE)).put("name", "张三");
+   ((FlashMap) ((ServletRequestAttributes) (RequestContextHolder.getRequestAttributes())).getRequest().getAttribute(DispatcherServlet.OUTPUT_FLASH_MAP_ATTRIBUTE)).put("name", "张三");
    ```
 
 2. 通过传入的RedirectAttributes参数设置
@@ -678,15 +771,329 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 ![](http://ww1.sinaimg.cn/large/8747d788gy1fu5qtzvukqj22ve3h7x2l.jpg)
 
+### 10.5 小结
+
+本章整体分析了Spring MVC中请求处理的过程。首先对三个Servlet进行了分析，然后单独分析了DispatcherServlet中的doDispat方法。
+
+三个 Servlet的处理过程大致功能如下:
+
+* HttpservletBean：没有参与实际请求的处理。
+
+* Framework Servlet：将不同类型的请求合并到了 processRequest方法统一处理,
+  processRequest方法中做了三件事:
+  * 调用了 doService模板方法具体处理请求。
+  * 将当前请求的 Locale Context和 ServletrequestAttributes在处理请求前设置到了Locale contextholder和 Request ContextHolder,并在请求处理完成后恢复,
+  * 请求处理完后发布了 ServletRequestHandledEvent消息。
+* Dispatcher Servlet：doService方法给 request设置了一些属性并将请求交给 dispatch方法具体处理。
+
+Dispatcher Servlet中的 dispatch方法完成 Spring MVC中请求处理过程的顶层设计,它使用 Dispatcher Servlet中的九大组件完成了具体的请求处理。另外 HandlerMapping、 Handler和 HandlerAdapter这三个概念的含义以及它们之间的关系也非常重要。
 
 
 
+## 第12章 HandlerMapping
+
+HandlerMapping类图如下：
+
+![](http://ww1.sinaimg.cn/large/8747d788gy1fuapyod0bnj21kw0hygwq.jpg)
+
+### 12.1 AbstractHandlerMapping
+
+#### 12.1.1 创建AbstractHandlerMapping之器
+
+AbstractHandlerMapping的初始化工作（在被实例化之后）方法为：`initApplicationContext()`
+
+该方法主要是处理拦截器相关工作。
+
+```java
+protected void initApplicationContext() throws BeansException {
+    extendInterceptors(this.interceptors);	// 模板方法，但没实现
+    detectMappedInterceptors(this.adaptedInterceptors);	//加载容器中的拦截器到adaptedInterceptors属性中
+    initInterceptors();    // 将interceptors属性中合适的拦截器添加到adaptedInterceptors属性中
+}
+```
+
+> 因为`AbstractHandlerMapping`的父类`WebApplicationObjectSUpport`实现了`ApplicatonContextAware`接口，`setApplicationContext`方法调用了`initApplicationContext()`：
+
+类图如下：
+
+![](http://ww1.sinaimg.cn/large/8747d788gy1fuaq4ic1maj21kw0sfgwl.jpg)
+
+附录：
+
+1. 拦截器列表 interceptors
+
+   用于配置SpringMVC的拦截器，配置方式有两种：
+
+- 1. 注册HandlerMapping时通过属性设置
+
+- 2. 通过子类的extendInterceptors钩子方法进行设置（extendInterceptors方法是在initApplicationContext中调用的）
+
+  interceptors并不会直接使用，而是通过initInterceptors方法按照类型分配到~~mappedInterceptors~~和adaptedInterceptors中进行使用，interceptors只用于配置。
+
+  ```java
+  private final List<Object> interceptors = new ArrayList<Object>();
+  ```
+
+2. adaptedInterceptors
+
+   被分配到adaptedInterceptors中的类型的拦截器不需要进行匹配，在getHandler中会全部添加到返回值HandlerExecutionChain里面。他 只能从 interceptors中获取。
+
+   ```java
+   private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<HandlerInterceptor>();
+   ```
 
 
 
+#### 12.1.2 AbstractHandlerMapping之用 
 
+>  方法很简单，看下源码即可(版本是4.3.18)：
 
+入口方法是getHandler():
 
+```java
+@Override
+public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+    Object handler = getHandlerInternal(request);	// 模板方法
+    if (handler == null) {
+        handler = getDefaultHandler();
+    }
+    if (handler == null) {
+        return null;
+    }
+    // Bean name or resolved handler?
+    if (handler instanceof String) {
+        String handlerName = (String) handler;
+        handler = getApplicationContext().getBean(handlerName);
+    }
+
+    HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
+    if (CorsUtils.isCorsRequest(request)) {
+        CorsConfiguration globalConfig = this.globalCorsConfigSource.getCorsConfiguration(request);
+        CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
+        CorsConfiguration config = (globalConfig != null ? globalConfig.combine(handlerConfig) : handlerConfig);
+        executionChain = getCorsHandlerExecutionChain(request, executionChain, config);
+    }
+    return executionChain;
+}
+```
+
+---
+
+getHandlerExecutionChain(Object handler, HttpServletRequest request)：
+
+```java
+protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+    HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
+            (HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
+
+    String lookupPath = this.urlPathHelper.getLookupPathForRequest(request);
+    for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
+        if (interceptor instanceof MappedInterceptor) {
+            MappedInterceptor mappedInterceptor = (MappedInterceptor) interceptor;
+            if (mappedInterceptor.matches(lookupPath, this.pathMatcher)) {
+                chain.addInterceptor(mappedInterceptor.getInterceptor());
+            }
+        }
+        else {
+            chain.addInterceptor(interceptor);
+        }
+    }
+    return chain;
+}
+```
+
+### 12.2 AbstractUrlHandlerMapping系列（略）
+
+#### 12.2.1 AbstractUrlHandlerMapping 
+
+#### 12.2.2 SimpleUrlHandlerMapping
+
+#### 12.2.3 AbstractDetectingUrlHandlerMapping
+
+ 
+
+ ### 12.3 AbstractHandlerMethodMapping系列
+
+> AbstractHandlerMethodMapping系列将Method作为Handler来使用，他专门有一个类型 -- HandlerMethod
+
+#### 12.3.1 创建AbstractHandlerMethodMapping系列之器
+
+> 先一句话总结：该类实例化后，初始化中查找HandlerMethod，并j将结果放到内部类属性`MappingRegistry`中：
+>
+> ![](http://ww1.sinaimg.cn/large/8747d788gy1fublgw06j9j20sg0d0dqk.jpg)
+
+入口方法为`afterPropertiesSet()`，因为该类实现了`InitilalizingBean`接口.
+
+```java
+@Override
+public void afterPropertiesSet() {
+    initHandlerMethods();
+}
+```
+
+AbstractHandlerMethodMapping#initHandlerMethods
+
+```java
+/**
+    * Scan beans in the ApplicationContext, detect and register handler methods.
+    * @see #isHandler(Class)
+    * @see #getMappingForMethod(Method, Class)
+    * @see #handlerMethodsInitialized(Map)
+    */
+protected void initHandlerMethods() {
+    if (logger.isDebugEnabled()) {
+        logger.debug("Looking for request mappings in application context: " + getApplicationContext());
+    }
+    String[] beanNames = (this.detectHandlerMethodsInAncestorContexts ?
+            BeanFactoryUtils.beanNamesForTypeIncludingAncestors(getApplicationContext(), Object.class) :
+            getApplicationContext().getBeanNamesForType(Object.class));
+
+    for (String beanName : beanNames) {
+        if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
+            Class<?> beanType = null;
+            try {
+                beanType = getApplicationContext().getType(beanName);
+            }
+            catch (Throwable ex) {
+                // An unresolvable bean type, probably from a lazy bean - let's ignore it.
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Could not resolve target class for bean with name '" + beanName + "'", ex);
+                }
+            }
+    ----→   if (beanType != null && isHandler(beanType)) {	// 找到handler，RequestMappingHandlerMapping有实现：Controller || RequestMapping注解
+    -----→      detectHandlerMethods(beanName);	//handler中找method
+            }
+        }
+    }
+    handlerMethodsInitialized(getHandlerMethods());	// 模板方法，但是没有类实现
+}
+```
+
+==AbstractHandlerMethodMapping#detectHandlerMethods==
+
+```java
+/**
+    * Look for handler methods in a handler.
+    * @param handler the bean name of a handler or a handler instance
+    */
+protected void detectHandlerMethods(final Object handler) {
+    Class<?> handlerType = (handler instanceof String ?
+            getApplicationContext().getType((String) handler) : handler.getClass());
+    final Class<?> userType = ClassUtils.getUserClass(handlerType);
+
+    Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
+            new MethodIntrospector.MetadataLookup<T>() {
+                @Override
+                public T inspect(Method method) {
+                    try {
+        -----------→    return getMappingForMethod(method, userType);
+                    }
+                    catch (Throwable ex) {
+                        throw new IllegalStateException("Invalid mapping on handler class [" +
+                                userType.getName() + "]: " + method, ex);
+                    }
+                }
+            });
+
+    if (logger.isDebugEnabled()) {
+        logger.debug(methods.size() + " request handler methods found on " + userType + ": " + methods);
+    }
+    for (Map.Entry<Method, T> entry : methods.entrySet()) {
+        Method invocableMethod = AopUtils.selectInvocableMethod(entry.getKey(), userType);
+        T mapping = entry.getValue();
+    --→ registerHandlerMethod(handler, invocableMethod, mapping);
+    }
+}
+```
+
+提到的知识点：
+
+1. HandlerMethod类
+2. RequestMappingInfo和RequestCondition接口
+   ![](http://ww1.sinaimg.cn/large/8747d788gy1fubm3ohmerj21kw0f148u.jpg)
+
+#### 12.3.2 AbstractHandlerMethodMapping系列之用
+
+通过`getHandlerInternal`方法被调用：
+
+```java
+/**
+    * Look up a handler method for the given request.
+    */
+@Override
+protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+    String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
+    if (logger.isDebugEnabled()) {
+        logger.debug("Looking up handler method for path " + lookupPath);
+    }
+    this.mappingRegistry.acquireReadLock();
+    try {
+ ---→   HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
+        if (logger.isDebugEnabled()) {
+            if (handlerMethod != null) {
+                logger.debug("Returning handler method [" + handlerMethod + "]");
+            }
+            else {
+                logger.debug("Did not find handler method for [" + lookupPath + "]");
+            }
+        }
+        return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
+    }
+    finally {
+        this.mappingRegistry.releaseReadLock();
+    }
+}
+```
+
+```java
+/**
+    * Look up the best-matching handler method for the current request.
+    * If multiple matches are found, the best match is selected.
+    * @param lookupPath mapping lookup path within the current servlet mapping
+    * @param request the current request
+    * @return the best-matching handler method, or {@code null} if no match
+    * @see #handleMatch(Object, String, HttpServletRequest)
+    * @see #handleNoMatch(Set, String, HttpServletRequest)
+    */
+protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
+    List<Match> matches = new ArrayList<Match>();
+    List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
+    if (directPathMatches != null) {
+        addMatchingMappings(directPathMatches, matches, request);
+    }
+    if (matches.isEmpty()) {
+        // No choice but to go through all mappings...
+        addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
+    }
+
+    if (!matches.isEmpty()) {
+        Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
+        Collections.sort(matches, comparator);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Found " + matches.size() + " matching mapping(s) for [" +
+                    lookupPath + "] : " + matches);
+        }
+        Match bestMatch = matches.get(0);
+        if (matches.size() > 1) {
+            if (CorsUtils.isPreFlightRequest(request)) {
+                return PREFLIGHT_AMBIGUOUS_MATCH;
+            }
+            Match secondBestMatch = matches.get(1);
+            if (comparator.compare(bestMatch, secondBestMatch) == 0) {
+                Method m1 = bestMatch.handlerMethod.getMethod();
+                Method m2 = secondBestMatch.handlerMethod.getMethod();
+                throw new IllegalStateException("Ambiguous handler methods mapped for HTTP path '" +
+                        request.getRequestURL() + "': {" + m1 + ", " + m2 + "}");
+            }
+        }
+        handleMatch(bestMatch.mapping, lookupPath, request);
+        return bestMatch.handlerMethod;
+    }
+    else {
+        return handleNoMatch(this.mappingRegistry.getMappings().keySet(), lookupPath, request);
+    }
+}
+```
 
 
 
