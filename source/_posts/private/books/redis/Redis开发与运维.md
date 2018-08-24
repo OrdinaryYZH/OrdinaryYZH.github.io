@@ -264,7 +264,7 @@ object encoding hello
    - `XX` – 只有键key存在的时候才会设置key的值，updae
      不管key是否存在，都设置
 
-2. setnx key value 
+2. **setnx key value** 
    「**SET** if **N**ot e**X**ists」key不存在，才设置（相当于add）
 
 3. `SETEX key seconds value`
@@ -438,19 +438,21 @@ OK
 
 #### 2.3.1 API
 
-1. **hset(key, field, value)**：向名称为key的hash中添加元素field<—>value
-2. **hget(key, field)**：返回名称为key的hash中field对应的value
-3. **hmset(key, field1, value1,…,field N, value N)**：向名称为key的hash中添加元素field i<—>value i
-4. **hmget(key, field1, …,field N)**：返回名称为key的hash中field i对应的value
-5. **hincrby(key, field, integer)**：将名称为key的hash中field的value增加integer
-6. **hincrbyfloat(key, field, float)**：将名称为key的hash中field的value增加float
-7. **hexists(key, field)**：名称为key的hash中是否存在键为field的域
-8. **hdel(key, field)**：删除名称为key的hash中键为field的域
-9. **hlen(key)**：返回名称为key的hash中元素个数
-10. **hkeys(key)**：返回名称为key的hash中所有键
-11. **hvals(key)**：返回名称为key的hash中所有键对应的value
-12. **hgetall(key)**：返回名称为key的hash中所有的键（field）及其对应的value
-13. **hstrlen key field**：计算value的字符串长度
+| 命令                                              | 解释                                                  |
+| ------------------------------------------------- | ----------------------------------------------------- |
+| **hset(key, field, value)**                       | 向名称为key的hash中添加元素field<—>value              |
+| **hget(key, field)**                              | 返回名称为key的hash中field对应的value                 |
+| **hmset(key, field1, value1,…,field N, value N)** | 向名称为key的hash中添加元素field i<—>value i          |
+| **hmget(key, field1, …,field N)**                 | 返回名称为key的hash中field i对应的value               |
+| **hincrby(key, field, integer)**                  | 将名称为key的hash中field的value增加integer            |
+| **hincrbyfloat(key, field, float)**               | 将名称为key的hash中field的value增加float              |
+| **hexists(key, field)**                           | 名称为key的hash中是否存在键为field的域                |
+| **hdel(key, field)**                              | 删除名称为key的hash中键为field的域                    |
+| **hlen(key)**                                     | 返回名称为key的hash中元素个数                         |
+| **hkeys(key)**                                    | 返回名称为key的hash中所有键                           |
+| **hvals(key)**                                    | 返回名称为key的hash中所有键对应的value                |
+| **hgetall(key)**                                  | 返回名称为key的hash中所有的键（field）及其对应的value |
+| **hstrlen key field**                             | 计算value的字符串长度                                 |
 
 #### 2.3.2 内部编码
 
@@ -478,207 +480,422 @@ OK
 2. 字符串类型，序列化用户信息后保存
 3. Hash类型
 
-### 4. list
+### 2.4 list
 
-#### 4.1列表结构
+列表结构：
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrhxit3s6j225x0t1dpc.jpg)
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuf72xobggj21kw0l7gth.jpg)
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrk2uvvbsj22680uxk1g.jpg)
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuf71ofzaaj21kw0mhjz8.jpg)
 
-#### 4.2 重要的API
+注意：一个列表最多可以存储$2^{32}-1$个元素
 
-##### 4.2.1 增（rpush、lpush、linsert）
+#### 2.4.1 API
 
-1. rpush
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frrk6ayrmkj21xh0qzk5w.jpg)
-2. lpush
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frrk73f3uwj21x20q5175.jpg)
-3. linsert
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frrk8tw8fjj22590ulnk2.jpg)
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuf76o9m48j20sg0fcwjh.jpg)
 
-##### 4.2.2 删（lpop、rpop、lrem ）
+##### 1. 添加
 
-1. lpop
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frrkaw7ewjj21xt0ztds0.jpg)
+| 命令                                         | 解释                                                   |
+| -------------------------------------------- | ------------------------------------------------------ |
+| **rpush (key, value,  [value...])**          | 右边插入                                               |
+| **lpush (key, value,  [value...])**          | 左边插入                                               |
+| **linsert (key, beforeafter, pivot, value)** | 在某个元素之前/之后插入元素，在pivot之前/之后插入value |
 
-2. rpop
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frrkdcw7f1j21y80yzgxp.jpg)
+##### 2. 查找
 
-3. lrem
-   ![1527528777006](C:\Users\yao\AppData\Local\Temp\1527528777006.png)
+| 命令                         | 解释                                                         |
+| ---------------------------- | :----------------------------------------------------------- |
+| **lrange (key, start, end)** | 索引为0~n-1，从右到左为-1 ~ -n；end包括自身；lrange 0 -1为查询全部 |
+| **lindex (key, index**)      | 索取索引下标的元素                                           |
+| **llen (key)**               | 获取列表长度                                                 |
 
-4. ltrim
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frrkptxgewj21z91k81d0.jpg)
+##### 3. 删除
 
- ##### 4.2.3 查（lrange）
+| 命令                         | 解释                                                         |
+| ---------------------------- | ------------------------------------------------------------ |
+| **lpop (key)**               | 左边弹出                                                     |
+| **rpop (key)**               | 右边弹出                                                     |
+| **lrem (key, count, value)** | 删除指定元素(value)，个数为count<br />count>0：从左到右删除count个；<br />count<0：从右到左删除count个；<br />count=0：删除所有 |
+| **ltrim (key, start, end)**  | 删除下标[start, end]的元素                                   |
 
-   ###### 4.3.1 lrange
+##### 4. 修改
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrksycggwj21ze1hp7st.jpg)
+| 命令                         | 解释              |
+| ---------------------------- | ----------------- |
+| lset (key, index, newValue ) | 修改index下标的值 |
 
-###### 4.3.2 lindex
+##### 5. 阻塞操作
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrl2pmjl9j21xr11gh1d.jpg)
+| 命令                    | 解释         |
+| ----------------------- | ------------ |
+| blpop (key..., timeout) | 阻塞式左弹出 |
+| brpop (key..., timeout) | 阻塞式右弹出 |
 
-###### 4.3.3 llen![](https://ws1.sinaimg.cn/large/8747d788gy1frrl3mt73fj21xc13jqe3.jpg)
+timeout为0：立即返回，如果为空则阻塞
 
-##### 4.2.4 改
+timeout>0：阻塞timeout秒，如果为空则返回空
 
-###### 4.4.1 lset
+注意：
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrl9tdlx9j21ym10zney.jpg)
+1. 如果是多个键，brpop会从左到右便利键，一旦有一个键能弹出，客户端立即返回（应该是timeout为0时）
+2. 如果多个客户端对同意个键执行brpop，那么最先执行的客户端可以获取到弹出的值
 
-#### 4.3 实战-TimeLine
+#### 2.4.2 内部编码
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrlcnwf2vj223814eh2v.jpg)
+1. **ziplist**（压缩列表）：当列表元素个数小于list-max-ziplist-entries配置（默认512），同时列表每个元素大小小于list-max-ziplist-value配置（默认64字节）时，Redis会使用该结构
+2. **linkedlist**(链表)：ziplist不满足时，就是用该结构
+3. quicklist：Redis 3.2提供的
 
-#### 4.4 查漏补缺（blpop、brpop）
+#### 2.4.3 使用场景
 
-> 它是 [LPOP](http://redisdoc.com/list/lpop.html#lpop) 命令的阻塞版本，当给定列表内没有任何元素可供弹出的时候，连接将被 [BLPOP](http://redisdoc.com/list/blpop.html#blpop) 命令阻塞，直到等待超时或发现可弹出元素为止。
->
-> 当给定多个 `key` 参数时，按参数 `key` 的先后顺序依次检查各个列表，弹出第一个非空列表的头元素。
+1. 消息队列：lpush + brpop
+2. 文章列表：值得参考，看书P45
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrle5ufccj21v40xr4qp.jpg)
+列表实现栈和队列：
 
-#### 4.5 Tips（命令组合使用组成不同的数据结构）
+栈：lpush + lpop
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frrlexmn5uj21p50kgn5s.jpg)
+队列：lpush + rpop
 
+### 2.5 set
 
+结构：
 
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuhqfjl7ljj21770ns15a.jpg)
 
+注意：一个集合最多可以存储$2^{32}-1$个元素
 
-### 5. set
+特点:
 
-#### 5.1 集合结构
+1. 不可重复
+2. 无序
 
-##### 5.1.1 图解
+#### 2.5.1 API
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs83fvavcj21j80ueqdb.jpg)
+##### 2.5.1.1 集合内操作
 
-##### 5.1.2 特点
+| 命令                       | 解释                                           |
+| -------------------------- | ---------------------------------------------- |
+| sadd (key, element...)     | 添加元素                                       |
+| srem (key, element...)     | 删除元素                                       |
+| scard (key)                | 计算元素个数，card：cardinality                |
+| sismember (key, element)   | 判断元素是否在集合中                           |
+| srandmember (key, [count]) | 随机从集合返回count个元素，默认是1             |
+| spop (key)                 | 从集合内弹出元素，Redis 3.2开始也支持count参数 |
+| smembers (key)             | 获取所有元素                                   |
 
-1. 无序
-2. 无重复
-3. 集合间操作
+##### 2.5.1.1 集合间操作
 
-#### 5.2 集合内API
+| 命令                                                         | 解释                                        |
+| ------------------------------------------------------------ | ------------------------------------------- |
+| sinter (key...)                                              | 求多个集合的交集                            |
+| sunion (key...)                                              | 求多个集合的并集                            |
+| sdiff (key...)                                               | 求多个集合的差集                            |
+| sinterstore（distination, key...)<br />sunionstore（distination, key...)<br />sdiffstore（distination, key...) | 将交集、并集和差集的结果保存到distination中 |
 
-##### 5.2.1 sadd srem
+#### 2.5.2 内部编码
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs87bnhzgj21x70w2hcf.jpg)
+1. intset（整数集合）：当集合中的元素**都是整数**并且**元素个数小于set-max-intset-entries配置**（默认512）时
+2. hashtable（哈希表）：不满足intset时使用该结构
 
-##### 5.2.2 scard sismember srandmember smembers
+#### 2.5.3 使用场景
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8awwtwnj2215161hdt.jpg)
+* 标签
 
-> 注意：smembers 集合太大小心使用
+总的来说有以下几种:
 
-#### 5.3 实战
+1. sadd = Tagging（标签）
+2. spop/srandmember = Random item（生成随机数，比如抽奖）
+3. sadd + sinter = Social Graph（社交需求）
 
-##### 5.3.1 抽奖系统
+### 2.6 zset（有序集合）
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8ikpgfcj21fw0fv46a.jpg)
+结构
 
-##### 5.3.2 Like、赞、踩
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuis4tmkw0j21kw0uv7lh.jpg)
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8j7c2u6j21sf0px7hw.jpg)
+#### 2.6.1 API
 
-##### 5.3.3 标签（tag）
+##### 2.6.1.1 集合内
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8klangoj22650u1tz4.jpg)
+###### 1) 添加元素
 
-#### 5.4 集合间API(sdiff sinter sunion)
+1. **zadd (key, score, member [score, member...])**
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8mx4wjjj21xp157e81.jpg)
+   可选参数：
 
-##### 5.4.1 例子：共同关注
+   1. nx：member不存在才添加， = add
+   2. xx：member必须存在，用于更新
+   3. ch：返回此次操作后，有序集合元素和分数发生变化的个数
+   4. incr：对score做增加，相当于后面介绍的zincrby
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8nwa6jwj20te1337i6.jpg)
+###### 2) 获取元素/信息
 
-#### 5.5 TIPS
+2. **zcard (key)**：获取成员个数
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8qay6vxj21ip0fptfv.jpg)
+3. **zscore (key, member)**：获取某成员分数
 
+4. **zrank (key, member)**：返回menber排名，分数从低到高，排名从0开始
 
+5. **zrevrank (key, member)**：返回member倒数排名，分数从高到低
 
-### 6. zset（有序集合）
+6. **zrange (key, start end, [withscores])**：返回第[start, end]名成员，排名从0开始，[withscores]一并返回分数
 
-#### 6.1 有序集合结构
+7. **zrevrange (key, start end, [withscores])**：与zrange相反
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs8t1wpxtj21wp11ak7r.jpg)
+8. **zrangebyscore (key, min, max, [withscores], [limit offset count])**：返回分数在[min, max]之间的元素，[withscores]一并返回分数，[limit offset count]可以限制输出的起始位置和个数
 
-#### 6.2 API
+   同时min和max还支持开区间（小括号）和闭区间（中括号），-inf和+inf分别代表无限小和无限大
 
-##### 6.2.1 zadd
+   ```shell
+   127.0.0.1:6379> zrangebyscore user:ranking (200 +inf withscores
+   1) "tim"
+   2) "220"
+   3) "martin"
+   4) "250"
+   5) "tom"
+   6) "260"
+   ```
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs9hx761sj21yb16e7su.jpg)
+9. **zrevrangebyscore (key, min, max, [withscores], [limit offset count])**：和zrangebyscore 相反
 
-##### 6.2.2 zrem
+10. **zcount (key, min, max)**：返回分数在[min, max]内的元素个数
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs9miavfvj21z5169ker.jpg)
+###### 3) 修改元素
 
-##### 6.2.3 zscore
+11. **zincrby (key, increment member)** ：增加member分数
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs9p6hsqzj21yg16iavn.jpg)
+###### 4) 删除元素
 
-##### 6.2.4 zincrby
+12. **zrem (key, member...)**：删除成员,返回成功个数
+13. **zremrangebyrank (key, start,  end)**：删除指定排名内的升序元素
+14. **zremrangebyscore (key, min, max)**：删除指定分数范围内的成员
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs9qwvranj21y61737vb.jpg)
+##### 2.6.1.2 集合间
 
-##### 6.2.5 zcard
+###### 1) 交集
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frs9zg9ti0j21zr16s1dq.jpg)
+`zinterstore destination numkeys key [key ...][weights weight [weight ...]] [aggregate sum|min|max]`
 
-##### 6.2.6 zrank
+- destination：交集计算结果保存到这个键。
+- numkeys：需要做交集计算键的个数。
+- key[key...]：需要做交集计算的键。
+- weights weight[weight...]：每个键的权重，在做交集计算时，每个键中的每个member会将自己分数乘以这个权重，每个键的权重默认是1。
+- aggregate sum|min|max：计算成员交集后，分值可以按照sum（和）、min（最小值）、max（最大值）做汇总，默认值是sum
 
-`ZRANK key member `
+e.g.如果想让user：ranking：2的权重变为0.5，并且聚合效果使用max，可以执行如下操作：
 
+```shell
+127.0.0.1:6379> zinterstore user:ranking:1_inter_2 2 user:ranking:1
+user:ranking:2 weights 1 0.5 aggregate max
+(integer) 3
+127.0.0.1:6379> zrange user:ranking:1_inter_2 0 -1 withscores
+1) "mike"
+2) "91"
+3) "martin"
+4) "312.5"
+5) "tom"
+6) "444"
 ```
-redis> ZRANK salary tom                     # 显示 tom 的薪水排名，第二
+
+###### 2) 并集
+
+`zunionstore destination numkeys key [key ...][weights weight [weight ...]] [aggregate sum|min|max]`
+
+#### 2.6.2 内部编码
+
+1. **ziplist**（压缩列表）：当有序集合的元素个数小于zset-max-ziplistentries配置（默认128个），同时每个元素的值都小于zset-max-ziplist-value配置（默认64字节）时，Redis会用ziplist来作为有序集合的内部实现，ziplist可以有效减少内存的使用。
+2. **skiplist**（跳跃表）：当ziplist条件不满足时，有序集合会使用skiplist作为内部实现，因为此时ziplist的读写效率会下降。
+
+#### 2.6.3 使用场景
+
+排行榜系统
+
+主要需要实现以下4个功能。
+
+（1）添加用户赞数
+例如用户mike上传了一个视频，并获得了3个赞，可以使用有序集合的zadd和zincrby功能：
+
+`zadd user:ranking:2016_03_15 mike 3`
+
+如果之后再获得一个赞，可以使用zincrby：
+
+`zincrby user:ranking:2016_03_15 mike 1`
+
+（2）取消用户赞数
+由于各种原因（例如用户注销、用户作弊）需要将用户删除，此时需要将用户从榜单中删除掉，可以使用zrem。例如删除成员tom
+
+`zrem user:ranking:2016_03_15 mike`
+
+（3）展示获取赞数最多的十个用户此功能使用zrevrange命令实现：
+
+`zrevrangebyrank user:ranking:2016_03_15 0 9`
+
+（4）展示用户信息以及用户分数
+
+此功能将用户名作为键后缀，将用户信息保存在哈希类型中，至于用户的分数和排名可以使用zscore和zrank两个功能：
+
+`hgetall user:info:tom`
+`zscore user:ranking:2016_03_15 mike`
+`zrank user:ranking:2016_03_15 mike`
+
+
+
+### 2.7 键管理
+
+#### 2.7.1 单个键管理
+
+##### 1. 键重命名
+
+**rename (key, newkey)**
+
+注意：如果newkey已经存在了，那newkey的值就被覆盖了；为了防止这种情况，使用**renamenx**命令，确保只有newKey不存在是才有效，该命令在newkey已经存在的情况下返回0.
+
+还有2点要注意:
+
+1. 重命名会执行del命令删除旧的键，如果对应的value比较大，可能会阻塞
+2. rename和renamenx中的key和newkey相同时，Redis 3.2和之前的处理不一样：
+   * Redis 3.2会返回 OK
+   * Redis 3.2之前会有错误提示
+
+##### 2. 随机返回一个 键
+
+**randomkey**
+
+##### 3. 键过期
+
+###### 1) 设置过期
+
+1. **expire key seconds**：键在seconds后过期
+2. **expireat key timestamp**：键在秒级时间戳timestamp后过期
+
+例如如果需要将键hello在2016-08-01 00：00：00（秒级时间戳为1469980800）过期，可以执行如下操作：
+
+```shell
+127.0.0.1:6379> expireat hello 1469980800
 (integer) 1
 ```
 
-##### 6.2.7 demo
+对应的毫秒级别如下：
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsa119rk6j21od18mkjl.jpg)
+1. **pexpire key milliseconds**
+2. **pexpireat key milliseconds-timestamp**
 
-##### 6.2.8 zrange
+不管是过期时间，还是秒级别或者毫秒级别的设置，Redis内部都是使用pexpireat命令
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsa20hjkqj2203132qtl.jpg)
+###### 2) 查看过期时间
 
-##### 6.2.9 zrangebyscore
+1. **ttl**：秒级别
+2. **pttl**：毫秒级别
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsa3t5hqxj220j13h7wh.jpg)
+返回说明：
 
-##### 6.2.10 zcount
+- ≥ 0的整数：键剩余的过期时间（ttl是秒，pttl是毫秒）。
+- -1：键没有设置过期时间。
+- -2：键不存在
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsa4m4210j220d13k1kx.jpg)
+---
 
-##### 6.2.11 zremrangebyrank
+**以下是要注意的点**：
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsa7jv1l3j220l13w1kx.jpg)
+1. 如果expire key的键不存在，返回结果为0：
+2. 如果过期时间为负值，键会立即被删除，犹如使用del命令一样
+3. persist命令可以将键的过期时间清除
+4. 对于字符串类型键，执行set命令会去掉过期时间
+5. Redis不支持二级数据结构（例如哈希、列表）内部元素的过期功能，例如不能对列表类型的一个元素做过期时间设置
+6. setex命令作为set+expire的组合，不但是原子执行，同时减少了一次网络通讯的时间
 
-##### 6.2.12 zremrangebyscore
+##### 4. 迁移键
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsa8eox2hj220g13r1kx.jpg)
+###### 1） move(不建议生产中使用)
 
-##### 6.2.13 demo
+**move key db**：用于Redis内部数据库之间使用
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsa9fhf2oj21jq18ohdt.jpg)
+###### 2）dump + restore
 
-#### 6.3 实战 - 排行榜
+**dump key**	// 原客户端中执行
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsacovfxlj21sh1434qp.jpg)
+**resore key ttl value**	// 目标客户端中执行
 
-#### 6.4 查漏补缺（zrevrank、zrevrange、zrevrangebyscore、zinterstore、zunionstore）
+用于在不同的Redis实例间迁移。
 
-#### 6.5 总结
+###### 3）migrate
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsam5sklij217410ye0c.jpg)
+`migrate host port key|"" destination-db timeout [copy][replace] [keys key [key...] ]`
 
+该命令也用户不同Redis实例间迁移，但是是原子操作
 
+参数说明：
+
+- host：目标Redis的IP地址。
+- port：目标Redis的端口。
+- key|""：在Redis3.0.6版本之前，migrate只支持迁移一个键，所以此处是要迁移的键，但Redis3.0.6版本之后支持迁移多个键，如果当前需要迁移多个键，此处为空字符串""。
+- destination-db：目标Redis的数据库索引，例如要迁移到0号数据库，这里就写0。
+- timeout：迁移的超时时间（单位为毫秒）。
+- [copy]：如果添加此选项，迁移后并不删除源键。
+- [replace]：如果添加此选项，migrate不管目标Redis是否存在该键都会正常迁移进行数据覆盖。
+- [keys key[key...]]：迁移多个键，例如要迁移key1、key2、key3，此处填写“keys key1 key2 key3”。
+
+迁移的情况:
+
+1. **源Redis有hello**，目标Redis没有（理想情况），返回OK
+2. **源Redis有hello**，目标Redis也有，如果命令没有加replacecanshu ,会报错。
+3. **源Redis没有hello**，那么会报错
+
+#### 2.7.2 遍历键
+
+##### 1. keys
+
+`keys pattern`
+
+pattern使用的是glob风格的通配符：
+
+- *代表匹配任意字符。
+- ?代表匹配一个字符。
+- []代表匹配部分字符，例如[1，3]代表匹配1，3，[1-10]代表匹配1到10的任意数字。
+- \x用来做转义，例如要匹配星号、问号需要进行转义。
+
+知识点，删除video字符串开头的键：
+
+**redis-cli keys video* | xargs redis-cli del**
+
+**键太多，注意阻塞**
+
+##### 2. scan，渐进式遍历
+
+`scan cursor [match pattern][count number]`
+
+- cursor是必需参数，实际上cursor是一个游标，第一次遍历从0开始，每次scan遍历完都会返回当前游标的值，直到游标值为0，表示遍历结束。
+- match pattern是可选参数，它的作用的是做模式的匹配，这点和keys的模式匹配很像。
+- count number是可选参数，它的作用是表明每次要遍历的键个数，默认值是10，此参数可以适当增大。
+
+除了scan以外，还有：`hscan`, `sscan`, `zscan`
+
+>  详细用法看书P69.
+
+总结：
+
+渐进式遍历可以有效的解决keys命令可能产生的阻塞问题，但是scan并非完美无瑕，如果在scan的过程中如果有键的变化（增加、删除、修改），那么遍历效果可能会碰到如下问题：新增的键可能没有遍历到，遍历出了重复的键等情况，也就是说scan并不能保证完整的遍历出来所有的键，这些是我们在开发时需要考虑的。
+
+#### 2.7.3 数据库管理
+
+##### 1. 切换数据库
+
+Redis实例有16个数据库，以数字为标记，从0开始。**但是一般不使用多个数据库**
+
+`select dbindex`
+
+##### 2. flushdb/flushall
+
+`flushdb`：清除当前数据库
+
+`flushall`：清除所有数据库
+
+两个问题：
+
+- flushdb/flushall命令会将所有数据清除，一旦误操作后果不堪设想，第12章会介绍rename-command配置规避这个问题，以及如何在误操作后快速恢复数据。
+- 如果当前数据库键值数量比较多，flushdb/flushall存在阻塞Redis的可能性。
 
 ## 第3章 Redis客户端的使用（这里只说明Java客户端）
 
