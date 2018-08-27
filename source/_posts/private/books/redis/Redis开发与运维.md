@@ -8,7 +8,6 @@
 
 3. 多种数据结构
    ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7e4yzzyj21rv0z9tok.jpg)
-   ​
 
    ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7rg59aoj21980m7wjs.jpg)
 
@@ -61,7 +60,7 @@ Linux下软件安装的2种方式：
 	wget http://download.redis.io/redis-3.0.7.tar.gz
 2) 解压
 	tar xvzf redis-3.0.7.tar.gz
-3) 简历一个redis目录的软连接，指向redis-3.0.7
+3) 建立一个redis目录的软连接，指向redis-3.0.7
 	ln -s redis-3.0.7 redis
 4)进入redis目录
 	cd redis-3.0.7
