@@ -1,4 +1,4 @@
-第9章 创建Spring MVC之器
+## 第9章 创建Spring MVC之器
 
 ### 9.1 整体结构介绍
 
@@ -768,7 +768,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 流程如下图：
 
-![](http://ww1.sinaimg.cn/large/8747d788gy1fu5qtzvukqj22ve3h7x2l.jpg)
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuu1furjf0j21kw1wwhdt.jpg)
 
 ### 10.5 小结
 
@@ -1164,7 +1164,11 @@ RequestMappingHandlerAdapter实现的三个模板方法内容如下：
 
 * 具体进行绑定的方法
 
-  参数的具体解析是使用HandlerMethodArgumentResolver类型的组件完成的。前面说到注释了@InitBinder的方法也需要绑定参数，所以@InitBinder注释的方法也需要ArgumentResolver来解析参数，但是他使用的和Handler使用的不是同一套ArgumentResolver。另外，注释了@ModelAttribute的方法也需要绑定参数，他使用的ArgumentResolver和Handler是同一套。
+  参数的具体解析是使用HandlerMethodArgumentResolver类型的组件完成的。
+
+  前面说到注释了@InitBinder的方法也需要绑定参数，所以@InitBinder注释的方法也需要ArgumentResolver来解析参数，但是他使用的和Handler使用的不是同一套ArgumentResolver。
+
+  另外，注释了@ModelAttribute的方法也需要绑定参数，他使用的ArgumentResolver和Handler是同一套。
 
 > 多知道点：@InitBinder @ModelAttribute @ControllerAdvice以及ResponseBodyAdvice接口的作用 P164
 
@@ -1290,6 +1294,56 @@ private List<HandlerMethodArgumentResolver> getDefaultArgumentResolvers() {
 ```
 
 #### 13.2.2 RequestMappingHandlerAdapter之用
+
+入口方法就是handleInternal()：
+
+```java
+@Override
+protected ModelAndView handleInternal(HttpServletRequest request,
+        HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
+
+    ModelAndView mav;
+    checkRequest(request);
+
+    // Execute invokeHandlerMethod in synchronized block if required.
+    if (this.synchronizeOnSession) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            Object mutex = WebUtils.getSessionMutex(session);
+            synchronized (mutex) {
+       ---→     mav = invokeHandlerMethod(request, response, handlerMethod);
+            }
+        }
+        else {
+            // No HttpSession available -> no mutex necessary
+       ---→ mav = invokeHandlerMethod(request, response, handlerMethod);
+        }
+    }
+    else {
+        // No synchronization on session demanded at all...
+        mav = invokeHandlerMethod(request, response, handlerMethod);
+    }
+
+    if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
+        if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {
+            applyCacheSeconds(response, this.cacheSecondsForSessionAttributeHandlers);
+        }
+        else {
+            prepareResponse(response);
+        }
+    }
+
+    return mav;
+}
+```
+
+书上的代码跟4.3.18好像差的有点多。
+
+书上提到@SessionAttributes注解，但是感觉用处不大，而且有点复杂，平时用不上，所以忽略
+
+主要看`invokeHandlerMethod`方法
+
+
 
 
 
