@@ -896,35 +896,219 @@ Redis实例有16个数据库，以数字为标记，从0开始。**但是一般�
 - flushdb/flushall命令会将所有数据清除，一旦误操作后果不堪设想，第12章会介绍rename-command配置规避这个问题，以及如何在误操作后快速恢复数据。
 - 如果当前数据库键值数量比较多，flushdb/flushall存在阻塞Redis的可能性。
 
-## 第3章 Redis客户端的使用（这里只说明Java客户端）
-
-### 3.1 Jedis直连
-
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsexbk4q5j21zd14de81.jpg)
-
-### 3.2 Jedis简单实用
-
-![](https://ws1.sinaimg.cn/large/8747d788gy1frseyg1ztsj21w80z91kx.jpg)
-
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsezj9sonj21w80rjnoy.jpg)
-
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsf0e4iitj21tm0qph77.jpg)
-
-### 3.3 Jedis连接池使用
-
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsf1os2ioj21w20ewwxl.jpg)
-
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsf2wsfyfj21ux1287tq.jpg)
-
-### 3.4 方案对比
-
-![](https://ws1.sinaimg.cn/large/8747d788gy1frsf458vpoj22750y4b29.jpg)
 
 
 
-## 第4章 瑞士军刀Redis其他功能
 
-### 4.1 慢查询
+## 第3章 小功能大用处
+
+### 3.1 慢查询分析
+
+> Redis客户端执行一条命令分为以下4个部分：
+>
+> ![](https://ws1.sinaimg.cn/large/8747d788gy1fuv6ycesxyj215o0oi122.jpg)
+>
+> **慢查询统计的是第3个步骤的时间**。
+
+#### 3.1.1 慢查询的两个配置参数
+
+> **Redis的慢查询存在内存中，使用List存储，List有长度，超过长度的日志会被会删掉，类似队列。**
+
+可通过配置以下两个参数:
+
+1. `slowlog-log-slower-than`：超过xx微秒的命令会被记录
+2. `slowlog-max-len`：存储日志的List长度
+
+配置方法有：
+
+1. 修改配置文件
+
+2. 使用config set命令
+
+   ```shell
+   config set slowlog-log-slower-than 20000 # =0会记录所有命令
+   config set slowlog-max-len 1000		 	 # <0会不记录任何命令
+   config rewrite # 该命令可将配置持久化到本地配置文件
+   ```
+
+管理慢查询的命令：
+
+1. 获取慢查询日志
+
+   `slowlog get [n]`：n指定条数
+
+   e.g.
+
+   ```shell
+   slowlog get
+   1)  1) (integer) 666		#id
+       2) (integer) 1456786500 #发生时间戳
+       3) (integer) 11615		#耗时
+       4) 1) "BGREWRITEAOF"	#执行命令和参数
+   2)  1) (integer) 665
+       2) (integer) 1456718400
+       3) (integer) 12006
+       4)  1) "SETEX"
+           2) "video_info_200"
+           3) "300"
+           4) "2"
+   ...
+   ```
+
+2. 获取慢查询List长度
+
+   `slowlog len`
+
+3. 慢查询日志重置
+
+   `slowlog reset`：实际是对列表做清理操作
+
+#### 3.1.2 最佳实践
+
+1.  slowlog-max-len配置建议：Redis记录并不会占用大量内存，线上可以调大一点，1000以上，防止慢查询过多被剔除过多命令。
+2.  slowlog-log-slower-than配置建议：可以根据并发量配置该选项，注：默认10毫秒即为慢查询，OPS为100000。如果查询在1毫秒以上，那么Redis的OPS最多1000...
+3.  客户端超时，一种可能是其他慢查询导致命令队列阻塞
+4.  因为慢查询日志是一个在内存中的队列， 那么如果慢查询过多，那么会丢失部分日志。最好能够将其持久化起来（例如MySQL）
+
+### 3.2 Redis Shell
+
+#### 3.2.1 redis-cli 详解
+
+| 参数              | 解释                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| -r                | 将命令执行多次                                               |
+| -i                | 命令每个几秒执行一次，配合-r使用                             |
+| -x                | 选项代表从标准输入（stdin）读取数据作为redis-cli的最后一个参数 |
+| -c                | Redis Cluster相关                                            |
+| -a                | 设置了密码时可使用                                           |
+| --scan和--pattern | 扫描指定模式的键                                             |
+| --slave           | 将当前客户端模拟成当前Redis节点的从节点                      |
+| --rdb             | 请求Redis实例生成并发送RDB持久化文件，保存在本地             |
+| --pipe            | 将命令封装成Redis通信协议定义的数据格式，批量发送给Redis执行 |
+| --bigkeys         | 选项使用scan命令对Redis的键进行采样，从中找到内存占用比较大的键值，这些键可能是系统的瓶颈 |
+| --eval            | 执行指定Lua脚本                                              |
+| --latency         | 有三个选项，分别是--latency、--latency-history、--latency-dist。它们都可以检测网络延迟，对于Redis的开发和运维非常有帮助。 |
+| --stat            | 可以实时获取Redis的重要统计信息，虽然info命令中的统计信息更全，但是能实时看到一些增量的数据（例如requests）对于Redis的运维还是有一定帮助的 |
+| --raw和--no-raw   | --no-raw选项是要求命令的返回结果必须是原始的格式，--raw恰恰相反，返回格式化后的结果 |
+
+#### 3.2.2. redis-server详解
+
+redis-server --test-memory xxxx
+
+可以用来检测当前操作系统能否稳定地分配指定容量的内存给Redis，通过这种检测可以有效避免因为内存问题造成Redis崩溃。
+
+通常无需每次开启Redis实例时都执行--test-memory选项，该功能更偏向于调试和测试，例如，想快速占满机器内存做一些极端条件的测试，这个功能是一个不错的选择。
+
+#### 3.2.3 redis-benchmark详解
+
+> redis-benchmark可以为Redis做基准性能测试，它提供了很多选项帮助开发和运维人员测试Redis的相关性能
+
+| 参数          | 解释                                                         |
+| ------------- | ------------------------------------------------------------ |
+| -c            | -c（clients）选项代表客户端的并发数量（默认是50）            |
+| -n  <request> | -n（num）选项代表客户端请求总量（默认是100000）              |
+| -q            | -q选项仅仅显示redis-benchmark的requests per second信息       |
+| -r            | 想向Redis插入更多的键，可以执行使用-r（random）选项，可以向Redis插入更多随机的键 |
+| -P            | 代表每个请求pipeline的数据量（默认为1）                      |
+| -k <boolean>  | 代表客户端是否使用keepalive，1为使用，0为不使用，默认值为1。 |
+| -t            | 可以对**指定命令**进行基准测试。                             |
+| --csv         | 会将结果按照csv格式输出，便于后续处理，如导出到Excel等       |
+
+
+
+### 3.3 Pipeline
+
+#### 3.3.1 Pipeline概念
+
+Redis客户端执行一条命令分为如下四个过程：
+
+1. 发送命令
+2. 命令排队
+3. 命令执行
+4. 返回结果
+
+其中 1和4 称为Round Trip Time（RTT，往返时间）
+
+**问题：**虽然Redis提供了批量操作命令（例如mget、mset等），有效地节约RTT。**但大部分命令是不支持批量操作的**，例如要执行n次**hgetall**命令，并没有mhgetall命令存在，需要消耗n次RTT
+
+**解决：**Pipeline（流水线）机制能改善上面这类问题，它能将一组Redis命令进行组装，通过一次RTT传输给Redis，再将这组Redis命令的执行结果按顺序返回给客户端
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuvbe0q9crj22fe0x5wwa.jpg)
+
+#### 3.3.2 性能测试
+
+在不同网络下测试，得出以下结论：
+
+1. Pipeline执行速度一般比逐条执行要快
+2. 客户端和服务端的网络延时越大， Pepeline效果越明显
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuvbjbxc92j21h3089diq.jpg)
+
+#### 3.3.3 原生批量命令与Pipeline对比
+
+1. 原生批量命令是原子的，Pipeline是非原子的。
+2. 原生批量命令是一个命令对应多个key，Pipeline支持多个命令。
+3. 原生批量命令是Redis服务端支持实现的，而Pipeline需要服务端和客户端的共同实现
+
+#### 3.3.4 最佳实践
+
+**不要一次传输太多**，因为会增加客户端的等待时间，而且会造成一定的网络阻塞。
+
+Pepeline只能操作一个Redis实例，但是在分布式Redis中，也可以作为批量操作的重要优化手段
+
+### 3.4 事务与Lua
+
+#### 3.4.1 事务
+
+Redis提供了简单的事务功能，将一组命令放在multi和exec两条命令之间。
+
+如果要停止事务的执行，使用discard代替exec。
+
+事务中出现错误的情况：
+
+1. 命令错误，可能将set写成了sett，那么整个事务无法执行
+
+2. 运行时错误，例如用户B在添加粉丝列表时，误把sadd命令写成了zadd命令，这种就是运行时命令，因为语法是正确的
+
+   ```shell
+   127.0.0.1:6379> multi
+   OK
+   127.0.0.1:6379> sadd user:a:follow user:b
+   QUEUED
+   127.0.0.1:6379> zadd user:b:fans 1 user:a # key已经存在
+   QUEUED
+   127.0.0.1:6379> exec
+   1) (integer) 1
+   2) (error) WRONGTYPE Operation against a key holding the wrong kind of value
+   127.0.0.1:6379> sismember user:a:follow user:b
+   (integer) 1
+   ```
+
+   Redis不支持回滚，可以看出第一条命令已经执行了
+
+有些场景需要在事务之前，确保事务中的key没有被其他客户端修改过，才执行事务，否则不执行（类似乐观锁）。Redis提供了watch命令来解决这类问题，如下图：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuvcuvgmy6j21hy0etadp.jpg)
+
+#### 3.4.2 Lua用法简述
+
+#### 3.4.3 Redis与Lua
+
+#### 3.4.4 案例
+
+#### 3.4.5 Redis如何管理Lua脚本
+
+### 3.5 Bitmaps
+
+### 3.6 Hyper'Log'Log
+
+### 3.7 发布订阅
+
+### 3.8 GEO
+
+
+
+
 
 
 
