@@ -1171,6 +1171,8 @@ RequestMappingHandlerAdapter实现的三个模板方法内容如下：
   另外，注释了@ModelAttribute的方法也需要绑定参数，他使用的ArgumentResolver和Handler是同一套。
 
 > 多知道点：@InitBinder @ModelAttribute @ControllerAdvice以及ResponseBodyAdvice接口的作用 P164
+>
+> 参考：[SpringMVC的@InitBinder注解使用](http://blog.51cto.com/simplelife/1919597)
 
 ### 13.2 RequestMappingHandlerAdapter自身结构
 
@@ -1324,6 +1326,7 @@ protected ModelAndView handleInternal(HttpServletRequest request,
         mav = invokeHandlerMethod(request, response, handlerMethod);
     }
 
+   	// 给response设置缓存
     if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
         if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {
             applyCacheSeconds(response, this.cacheSecondsForSessionAttributeHandlers);
@@ -1337,11 +1340,108 @@ protected ModelAndView handleInternal(HttpServletRequest request,
 }
 ```
 
-书上的代码跟4.3.18好像差的有点多。
+书上的代码跟4.3.18有点差别，但是大致思路一样。
 
-书上提到@SessionAttributes注解，但是感觉用处不大，而且有点复杂，平时用不上，所以忽略
+handleInternal()方法主要就是做以下2件事情
 
-主要看`invokeHandlerMethod`方法
+1. 使用HandlerMethod处理
+2. 设置response缓存
+
+书上提到了@SessionAttributes注解的用法，参考P177，但是感觉用处不大。
+
+主要看`invokeHandlerMethod`方法:
+
+##### invokeHandleMethod方法
+
+先看下代码：
+
+```java
+protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
+        HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
+
+    ServletWebRequest webRequest = new ServletWebRequest(request, response);
+    try {
+  ---→  WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+  ---→  ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
+
+  ---→  ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
+        invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
+        invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
+        invocableMethod.setDataBinderFactory(binderFactory);
+        invocableMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
+
+  ---→  ModelAndViewContainer mavContainer = new ModelAndViewContainer();
+        mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
+        modelFactory.initModel(webRequest, mavContainer, invocableMethod);
+        mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
+
+        AsyncWebRequest asyncWebRequest = WebAsyncUtils.createAsyncWebRequest(request, response);
+        asyncWebRequest.setTimeout(this.asyncRequestTimeout);
+
+        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+        asyncManager.setTaskExecutor(this.taskExecutor);
+        asyncManager.setAsyncWebRequest(asyncWebRequest);
+        asyncManager.registerCallableInterceptors(this.callableInterceptors);
+        asyncManager.registerDeferredResultInterceptors(this.deferredResultInterceptors);
+
+        if (asyncManager.hasConcurrentResult()) {
+            Object result = asyncManager.getConcurrentResult();
+            mavContainer = (ModelAndViewContainer) asyncManager.getConcurrentResultContext()[0];
+            asyncManager.clearConcurrentResult();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found concurrent result value [" + result + "]");
+            }
+            invocableMethod = invocableMethod.wrapConcurrentResult(result);
+        }
+
+  ---→  invocableMethod.invokeAndHandle(webRequest, mavContainer);
+        if (asyncManager.isConcurrentHandlingStarted()) {
+            return null;
+        }
+
+  ---→ return getModelAndView(mavContainer, modelFactory, webRequest);
+    }
+    finally {
+        webRequest.requestCompleted();
+    }
+}
+```
+
+该方法的内容主要是：
+
+1. 创建了ServletWebRequest（构造时使用了request和response）
+
+2. 初始化`WebDataBinderFactory`
+
+   作用：从名字就能看出来这是用来创建`WebDataBinder`的，`WebDataBinder`用于参数绑定，实现参数跟String之间的类型转换。ArgumentResolver在进行参数解析的过程中使用到`WebDataBinder`，ModelFactory在更新Model时也会用到它。
+
+   创建的过程就是找出@InitBinder的方法，并将它们新建出`ServletRequestDataBinderFactory`类型的`WebDataBinderFactory`
+
+3. 初始化`ModelFactory`
+
+   `ModelFactory`是用来处理Model的，主要是这两个功能：
+
+   * 在处理器具体处理之前对Model进行初始化
+   * 在处理完请求后对Model参数进行更新
+
+   getModelFactory方法主要是：
+
+   1. 获取SessionAttributesHandler
+   2. 从处理器中获取@ModelAttribute且没有@RequestMapping的method
+   3. 从@ControllerAdvice类里找出@ModelAttribute的method
+   4. 最后使用注释了@ModelAttribute的方法、WebDataBinderFactory和SessionAttributesHandler创建`ModelFactory`
+
+4. 初始化`ServletInvocableHandlerMethod`
+
+5. （忽略异步处理）
+
+6. 新建传递参的`ModelAndViewContainer`容器，并将相应参数设置到其Model中
+
+7. 执行请求
+
+8. 请求处理完后的后置处理
+
+
 
 
 
