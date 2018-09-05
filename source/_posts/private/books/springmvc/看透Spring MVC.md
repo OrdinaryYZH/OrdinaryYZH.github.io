@@ -1433,13 +1433,13 @@ protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
 
 4. 初始化`ServletInvocableHandlerMethod`
 
-5. （忽略异步处理）
+（忽略异步处理）
 
-6. 新建传递参的`ModelAndViewContainer`容器，并将相应参数设置到其Model中
+5. 新建传递参的`ModelAndViewContainer`容器，并将相应参数设置到其Model中
 
-7. 执行请求
+6. 执行请求
 
-8. 请求处理完后的后置处理
+7. 请求处理完后的后置处理
 
 
 
