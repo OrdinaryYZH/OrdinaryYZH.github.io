@@ -2,23 +2,20 @@
 
 ### 1.2 Redis的特性
 
-1. 速度快（基于内存）
-
-2. 持久化
-
-3. 多种数据结构
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7e4yzzyj21rv0z9tok.jpg)
-
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7rg59aoj21980m7wjs.jpg)
-
-4. 支持多种编程语言
-
-5. 功能丰富
-
-6. 简单
-
+1. 速度快
+   * 基于内存
+   * 使用C语言实现，更接近底层，执行速度更快
+   * 使用单线程架构，预防了多线程可能的竞争问题，没有线程间切换时的时间
+   * 使用I/O多路复用模型
+2. 基于键值对的数据结构服务器
+3. 丰富的功能（提供5种数据结构外，还提供了许多额外的功能）
+4. 简单稳定
+   * 实现的源码不多；
+   * 而且使用单线程模型，服务端跟客户端处理都变得简单；
+   * Redis不依赖操作系统中的类库
+5. 客户端语言多
+6. 持久化
 7. 主从复制
-
 8. 高可用、分布式
 
 ### 1.3. Redis典型应用场景
@@ -663,7 +660,7 @@ timeout>0：阻塞timeout秒，如果为空则返回空
 
 ###### 3) 修改元素
 
-11. **zincrby (key, increment member)** ：增加member分数
+11. **zincrby (key, increment,  member)** ：增加member分数
 
 ###### 4) 删除元素
 
@@ -1100,15 +1097,229 @@ Redis提供了简单的事务功能，将一组命令放在multi和exec两条命
 
 ### 3.5 Bitmaps
 
-### 3.6 Hyper'Log'Log
+#### 3.5.1 数据结构模型
+
+Bitmaps本身不是一种数据结构，实际上她就是字符串，但可以对字符串的位进行操作
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuyh1kes34j21hc07jgpg.jpg)
+
+#### 3.5.2 命令
+
+下面的例子以用户访问网站记录为例，访问过的为1，id为偏移量，从0开始
+
+**感觉位图还是比较适合做签到功能，统计UV使用HyperLogLog比较省空间**
+
+##### 1. 设置值
+
+**setbit key offset value**
+
+e.g. setbit unique:users:2018-09-05 10241 // id为1024的用户在2018-09-05这天访问了网站
+
+##### 2. 获取值
+
+**getbit key offset**
+
+##### 3. 获取Bitmaps指定范围值为1的个数
+
+`bitcount key [start][end]`
+
+##### 4. Bitmaps间的运算
+
+**bitop op destkey key [key ...]**
+
+该操作中的op可以为and(交集)、or(并集)、not(非)、xor(异或)，并将其结果放到destkey中
+
+e.g. 统计某2天都访问过（任意一天）网站的用户数量
+
+##### 5. 计算Bitmaps中第一个值为targetBit的偏移量
+
+`bitpos key targetBit [start][end]` ：start和end表示字节，不是位
+
+#### 3.5.3 BitMaps分析
+
+用户数量的多少决定是用那种数据结构存储统计信息：
+
+1. 假设网站有1亿用户，每天独立访问的用户有5千万，如果每天用集合类型和Bitmaps分别存储活跃用户可以得到如下表
+
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1fuyja9901mj21ik07jdjo.jpg)
+
+   很明显，这种情况下使用Bitmaps能节省很多的内存空间，尤其是随着时间推移节省的内存还是非常可观的：
+
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1fuyjan8ynzj21j507ltad.jpg)
+
+2. 但Bitmaps并不是万金油，假如该网站每天的独立访问用户很少，例如只有10万（大量的僵尸用户），那么两者的对比如表所示，很显然，这时候使用Bitmaps就不太合适了，因为基本上大部分位都是0。
+
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1fuyjb5uaprj21id08dae4.jpg)
+
+### 3.6 HyperLogLog
+
+> **HyperLogLog**是一个基数估计算法，**只需要极少空间就可以计算超大基数**
+>
+> 简单来说，基数（cardinality，也译作势），是指一个集合（这里的集合允许存在重复元素）中不同元素的个数。例如看下面的集合：
+> {1,2,3,4,5,2,3,9,7}
+> 这个集合有9个元素，但是2和3各出现了两次，因此不重复的元素为1,2,3,4,5,9,7，所以这个集合的基数是7。
+>
+> PS：**pf**是HyperLogLog 这个数据结构的发明人 Philippe Flajolet 的首字母缩写
+
+#### 1. 添加
+
+**pfadd key element [element ...]**
+
+#### 2. 计算独立用户数
+
+**pfcount key [key...]**
+
+#### 3. 合并
+
+**pfmerge destkey sourcekey [sourcekey ...]**
+
+#### 4. 总结
+
+实际应用：统计网页的UV（**Unique visitor**）
+
+选型时注意以下2点：
+
+1. 只为了计算独立总数，不需要获取单条数据
+2. 可以容忍一定误差率（官方的数字是0.81%），毕竟非常节省内存，它需要占据一定 12k 的存储空间，所以它不适合统计单个用户相关的数据
 
 ### 3.7 发布订阅
 
+> Redis提供了的发布订阅机制，发布者跟订阅者不通过直接通信，而通过频道（channel）转发：
+>
+> ![](https://ws1.sinaimg.cn/large/8747d788gy1fuyonpoolbj21o00q6ds9.jpg)
+
+#### 3.7.1 命令
+
+##### 1. 发布消息
+
+**publish channel message**
+
+##### 2. 订阅消息
+
+**subscribe channel [channel ... ]**
+
+redis-cli：使用该命令后会一直监听消息，不处理其他命令，包括unsubscribe；而且要退出的话只是推出redis-cli，返回shell，而不是取消订阅
+
+参考：[Redis的Pub/Sub模式](https://my.oschina.net/itblog/blog/601284)
+
+##### 3. 取消订阅
+
+**unsubscribe [channel [channel ...] ]**
+
+##### 4. 按照模式订阅和取消订阅
+
+**psubscribe pattern [pattern ... ]** 
+
+**punsubscribe [pattern [pattern ...] ]**
+
+##### 5. 查询订阅
+
+1. 查看活跃的频道（至少有一个订阅者）
+   **pubsub channels [pattern]**
+
+2. 查看频道订阅数
+   **pubsub numsub [channel ...]**
+
+3. 查看模式订阅数
+
+   这个命令返回的不是订阅模式的客户端的数量， 而是客户端订阅的所有模式的数量总和。
+
+   **pubsub numpat**
+
+参考：http://redisdoc.com/pub_sub/pubsub.html
+
+#### 3.7.2应用场景
+
+个人想到的可能是弹幕系统。
+
+因为不支持持久化，没有很好的场景。
+
 ### 3.8 GEO
 
+> Redis 3.2提供了GEO（地理信息定位）功能。
 
+#### 1. 增加地理位置信息
 
+**geoadd key longitude latitude member [longitude latitude member....]**
 
+longitude：经度
+
+latitude：维度
+
+member：成员
+
+注意返回的结果：
+
+1. 如果新添加成功，返回1
+2. 如果已经存在了，则是修改成功，返回0（如果要更新位置信息，也使用geoadd，虽然返回结果为0。）
+
+结论：返回值是新增的数量。
+
+#### 2. 获取地理位置信息
+
+**geopos key menber [member...]**
+
+```shell
+127.0.0.1:6379> geopos cities:locations beijing
+1) 1) "116.28000229597091675"
+   2) "39.51099897006833572"
+```
+
+#### 3. 获取两个地理之位置的距离
+
+**geodist key member1 member2 [unit]**
+
+- m（meters）代表米。
+- km（kilometers）代表公里。
+- mi（miles）代表英里。
+- ft（feet）代表尺。
+
+#### 4. 获取指定位置范围内的地理信息集合
+
+`georadius key longitude latitude radiusm|km|ft|mi [withcoord][withdist] [withhash][COUNT count] [asc|desc][store key] [storedist key]`
+
+``georadiusbymember key member radiusm|km|ft|mi [withcoord][withdist][withhash][COUNT count] [asc|desc][store key] [storedist key]`
+
+georadius和georadiusbymember两个命令的作用是一样的，都是以一个地理位置为中心算出指定半径内的其他地理信息位置，不同的是georadius命令的中心位置给出了具体的经纬度，georadiusbymember只需给出成员即可。其中radiusm|km|ft|mi是必需参数，指定了半径（带单位），这两个命令有很多可选参数，如下所示：
+
+- withcoord：返回结果中包含经纬度。
+- withdist：返回结果中包含离中心节点位置的距离。
+- withhash：返回结果中包含geohash，有关geohash后面介绍。
+- COUNT count：指定返回结果的数量。
+- asc|desc：返回结果按照离中心节点的距离做升序或者降序。
+- store key：将返回结果的地理位置信息保存到指定键。
+- storedist key：将返回结果离中心节点的距离保存到指定键。
+
+例子：距离北京150公里以内的城市
+
+```shell
+127.0.0.1:6379> georadiusbymember cities:locations beijing 150 km
+1) "beijing"
+2) "tianjin"
+3) "tangshan"
+4) "baoding"
+```
+
+#### 5. 获取geohash
+
+**geohash key member [member...]**
+
+Redis使用geohash将二维经纬度转换为一维字符串，下面操作会返回beijing的geohash值。
+
+geohash的特点：
+
+* GEO的数据类型为zset，Redis将所有地理位置信息的geohash存放在zset中
+* 字符串越长，表示的位置更精确，表3-8给出了字符串长度对应的精度，例如geohash长度为9时，精度在2米左右
+* 两个字符串越相似，它们之间的距离越近，Redis利用字符串前缀匹配算法实现相关的命令。
+* geohash编码和经纬度是可以相互转换的。
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fuytrkm8p4j20u00okaea.jpg)
+
+#### 6. 删除地理位置信息
+
+因为底层实现是zset，所以使用的是zrem。
+
+**zem key member**
 
 
 
