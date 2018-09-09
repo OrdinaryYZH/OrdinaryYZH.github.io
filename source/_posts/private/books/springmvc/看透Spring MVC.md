@@ -1,3 +1,24 @@
+## 第8章 SPring MVC之初体验
+
+搭建一个最简单的Spring MVC环境：
+
+1. maven依赖servlet-api和spring-webmvc
+2. web.xml中配置DispatcherServlet
+3. 创建Spring MVC xml配置文件:
+   * `<mvc:annotation-driven/>`
+
+   * `<context: component-scan base-package="xxx">`，一般还配置只扫面@Controller注解
+
+     ```xml
+     <context:component-scan base-package="com.xxx"
+                             use-default-filters="false">
+         <context:include-filter type="annotation"
+                                 expression="org.springframework.stereotype.Controller"/>
+     </context:component-scan>
+     ```
+
+4. 创建Controller（和View）
+
 ## 第9章 创建Spring MVC之器
 
 ### 9.1 整体结构介绍
@@ -214,6 +235,9 @@ String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getN
 3. 在前面两种情况无效下，则创建一个（一般情况下是这个）
    具体方法是：`FrameworkServlet#createWebApplicationContext(WebApplicationContext xx)`
    内部调用了：`configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac)`
+
+
+
    知识点：ApplicationListener机制
 
    createWebApplicationContext(ApplicationContext parent)：
