@@ -100,7 +100,7 @@ null
 
 首先用一张图来表示三张图的关系如下：
 
-![image.png](http://upload-images.jianshu.io/upload_images/5879294-4d2114d3cb34e0b8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://ws1.sinaimg.cn/large/8747d788gy1fv98wlsmnlj20r20pqadq.jpg)
 
 - AppClassloader 的父加载器是 ExtClassloader。
 - ExtClassloader 的父加载器为 null，但是要注意的是 ExtClassloader 的父加载器并不是 BootstrapClassloader。
