@@ -1,68 +1,20 @@
 # ClassLoader
 
-## 什么是ClassLoader
+## 1. 什么是ClassLoader
 
 > Java 代码要想运行，首先需要将源代码进行编译生成 .class 文件，然后 JVM 加载 .class 字节码文件到内存，而 .class 文件是怎样被加载到 JVM 中的就是Java ClassLoader 要做的事情。
-
-### .class 文件何时被类加载器加载到 JVM 中？
-
-> 1.  new 操作时候；
 >
-> 2. 当我们使用 Class.forName("包路径+类名")、Class.forName("包路径+类名",ClassLoader)
+> 《深入理解Java虚拟机》中的解释：实现类加载阶段中”通过一个类的全限定名来获取描述此类的二进制字节流“这个动作的代码模块
+
+
+
+## 2. Java 原生的三种 ClassLoader
+
+### 2.1 BootstrapClassloader
+
+> 引导类加载器，又称启动类加载器，是最顶层的类加载器，主要加载核心类库，%JRE_HOME%\lib下的rt.jar、resources.jar、charsets.jar和class等。
 >
-> 3. ClassLoader.loadClass("包路径+类名")的时候就触发了类加载器去类加载对应的路径去查找 *.class，并创建 Class 对象。
->
->    ▲注意：另外需要注意的是除去 new 操作外，其他几种方式加载字节码到内存后只是生产一个 Class 对象，要产生具体的对象实例还需要使用 Class 对象 .newInstance() 函数来创建。
-
-## Java 原生的三种 ClassLoader
-
-### AppClassloader（应用类加载器/系统类加载器）
-
-> 它负责在 JVM 启动时，加载来自在命令java中的-classpath或者java.class.path系统属性或者 CLASSPATH 操作系统属性所指定的 JAR 类包和类路径
-
-1. API:
-   静态方法`ClassLoader.getSystemClassLoader()`：可以获得AppClassLoader
-2. 如果没有特别指定，则用户自定义的任何类加载器都将该类加载器作为它的父加载器，这点通过 `java.lang.ClassLoader` 的无参构造函数可以证明，代码如下:
-```java
-protected ClassLoader() {
-    this(checkCreateClassLoader(),getSystemClassLoader());
-}
-```
-
-3. 获取classpath加载路径：
-   `System.out.println(System.getProperty("java.class.path"));`
-4. 另外我们写的含有 main 函数的类的加载就是使用该类加载器进行加载的，证明如下：
-```java
-public static void main(String[] args) {
-    ClassLoader cl = App2.class.getClassLoader();
-    System.out.println(cl);
-    System.out.println(cl.getParent());
-}
-```
-
-运行结果如下。
-
-```java
-sun.misc.Launcher$AppClassLoader@4554617c
-sun.misc.Launcher$ExtClassLoader@677327b6
-```
-
-并且可以看出 AppClassLoader 的父加载器是 ExtClassLoader，那么 ExtClassLoader 是什么呢？
-
-### ExtClassloader
-
-> 扩展类加载器，主要负责加载 Java 的扩展类库
-
-1. 加载的路径
-   默认加载 `JAVA_HOME/jre/lib/ext/` 目录下的所有 Jar 包或者由 `java.ext.dirs` 系统属性指定的 Jar 包
-   可以通过系统属性`java.ext.dirs`查看
-2. ExtClassLoader 的父加载器为 null
-
-### BootstrapClassloader
-
-> 引导类加载器，又称启动类加载器，是最顶层的类加载器，主要用来加载 Java 核心类，如 rt.jar、resources.jar、charsets.jar 等。
->
-> 需要注意的是它不是 java.lang.ClassLoader 的子类，而是由 JVM 自身实现的，该类为 C 语言实现，所以严格来说它不属于 Java 类加载器范畴，Java 程序访问不到该加载器。
+> 需要注意的是它不是 java.lang.ClassLoader 的子类，而是由 JVM 自身实现的，不是Java语言实现的，一般是C++实现的
 
 通过下面代码我们可以查看该加载器查找类的扫描路径。
 
@@ -94,18 +46,62 @@ public void test() {
 null
 ```
 
-可知由于 BootstrapClassloader 对 Java 不可见，所以返回了 null，我们也可以通过看某一个类的加载器是否为 null 来作为判断该类是不是使用 BootstrapClassloader 进行加载的依据。另外上面提到 ExtClassLoader 的 父加载器返回的 null，那是否说明 ExtClassLoader 的父加载器是 BootstrapClassloader呢？
+可知由于 BootstrapClassloader 对 Java 不可见，所以返回了 null，我们也可以通过看某一个类的加载器是否为 null 来作为判断该类是不是使用 BootstrapClassloader 进行加载的依据。另外 ExtClassLoader 的 父加载器返回的 null，那是否说明 ExtClassLoader 的父加载器是 BootstrapClassloader呢？
 
-### 三种加载器关系
+### 2.2 ExtClassloader
+
+> 扩展类加载器，主要负责加载 Java 的扩展类库
+
+1. 加载的路径
+   默认加载 `JAVA_HOME/jre/lib/ext/` 目录下的所有 Jar 包或者由 `java.ext.dirs` 系统属性指定的 Jar 包
+   可以通过系统属性`java.ext.dirs`查看
+2. ExtClassLoader 的父加载器为 null
+
+### 2.3 AppClassloader（应用类加载器/系统类加载器）
+
+> 它负责在 JVM 启动时，加载来自在命令java中的-classpath或者java.class.path系统属性或者 CLASSPATH 操作系统属性所指定的 JAR 类包和类路径
+
+1. API:
+   静态方法`ClassLoader.getSystemClassLoader()`：可以获得AppClassLoader
+2. 如果没有特别指定，则用户自定义的任何类加载器都将该类加载器作为它的父加载器，这点通过 `java.lang.ClassLoader` 的无参构造函数可以证明，代码如下:
+```java
+protected ClassLoader() {
+    this(checkCreateClassLoader(),getSystemClassLoader());
+}
+```
+
+3. 获取classpath加载路径：
+   `System.out.println(System.getProperty("java.class.path"));`
+4. 另外我们写的含有 main 函数的类的加载就是使用该类加载器进行加载的，证明如下：
+```java
+public static void main(String[] args) {
+    ClassLoader cl = App2.class.getClassLoader();
+    System.out.println(cl);
+    System.out.println(cl.getParent());
+}
+```
+
+运行结果如下。
+
+```java
+sun.misc.Launcher$AppClassLoader@4554617c
+sun.misc.Launcher$ExtClassLoader@677327b6
+```
+
+
+
+### 2.4 三种加载器关系
 
 首先用一张图来表示三张图的关系如下：
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1fv98wlsmnlj20r20pqadq.jpg)
 
+**这里类加载器之间的父子关系一般不会以继承实现，而使用组合。**
+
 - AppClassloader 的父加载器是 ExtClassloader。
 - ExtClassloader 的父加载器为 null，但是要注意的是 ExtClassloader 的父加载器并不是 BootstrapClassloader。
 
-### 类加载器的构造
+### 2.5 类加载器的构造
 
 下面从源码来分析下 JVM 是如何构建内置 Classloader 的，具体是 rt.jar 包里面`sun.misc.Launcher`类。代码如下。
 
@@ -234,9 +230,9 @@ public static ClassLoader getAppClassLoader(final ClassLoader paramClassLoader)
 
 代码（3）创建了一个与线程相关的类加载器，这个后面会讲到。
 
-### 类加载器原理
+### 2.6 类加载器原理(委派模型)
 
-> Java 类加载器使用的是委托机制，也就是一个类加载器在加载一个类时候会首先尝试让父类加载器来加载。
+> Java 类加载器使用的是委派模型，也就是一个类加载器在加载一个类时候会首先尝试让父类加载器来加载。
 
 那么问题来了，为啥使用这种方式？
 
@@ -300,7 +296,7 @@ protected Class<?> loadClass(String name,boolean resolve)
 > - 网状加载顺序：在OSGI框架中，类加载器之间的关系是一个网，每个OSGI模块有一个类加载器，不同模块之间可能有依赖关系，在一个模块加载一个类时，可能是从自己模块加载，也可能是委派给其他模块的类加载器加载。
 > - 父加载器委派给子加载器加载：典型的例子有JNDI服务(Java Naming and Directory Interface)，它是Java企业级应用中的一项服务，具体我们就不介绍了。
 
-### ClassLoader vs Class.forName
+### 2.7 ClassLoader vs Class.forName
 
 在[反射](http://mp.weixin.qq.com/s?__biz=MzIxOTI1NTk5Nw==&mid=2650047510&idx=1&sn=6d8873ffbfd31e802d87ebf4ac135f39&chksm=8fde21c4b8a9a8d2df3eaec9a88ec9dfe748b2bfe7066cea0ea7c3dfc4f1f37d559305cccf7c&scene=21#wechat_redirect)一节，我们介绍过Class的两个静态方法forName：
 
@@ -309,7 +305,18 @@ public static Class<?> forName(String className)
 public static Class<?> forName(String name, boolean initialize, ClassLoader loader)
 ```
 
-第一个方法使用系统类加载器加载，第二个指定`ClassLoader`，参数`initialize`表示，加载后，是否执行类的初始化代码(如static语句块)，没有指定默认为true。
+第一个方法使用调用者的类加载器加载:
+
+```java
+@CallerSensitive
+public static Class<?> forName(String className)
+    throws ClassNotFoundException {
+    Class<?> caller = Reflection.getCallerClass();
+    return forName0(className, true, ClassLoader.getClassLoader(caller), caller);
+}
+```
+
+第二个指定`ClassLoader`，参数`initialize`表示，加载后，是否执行类的初始化代码(如static语句块)，没有指定默认为true。
 
 `ClassLoader`的`loadClass`方法与`forName`方法都可以加载类，它们有什么不同呢？
 
@@ -345,7 +352,7 @@ Class<?> cls = Class.forName(className);
 
 
 
-## 一种特殊的类加载器：ContextClassLoader
+## 3. 一种特殊的类加载器：ContextClassLoader
 
 > `ContextClassLoader` 是一种与线程相关的类加载器，类似 `ThreadLocal`，每个线程对应一个上下文类加载器：
 >
@@ -517,19 +524,23 @@ private ServiceLoader(Class<S> svc, ClassLoader cl) {
 }
 ```
 
-[关于ContextClassLoader的另一篇文章](http://alicharles.com/article/java-spi-serviceloader/)
+[关于ContextClassLoader的另一篇文章](https://www.alicharles.com/article/java/java-spi-serviceloader)
 
 
 
-## Tomcat ClassLoader（略）
+## 4. Tomcat ClassLoader（略）
 
-## 使用自定义类加载器实现模块隔离
+## 5. 使用自定义类加载器实现模块隔离
 
-## 自定义ClassLoader的应用 - 热部署
+## 6. 自定义ClassLoader的应用 - 热部署
 
-参考：[Java编程的逻辑 (87) - 类加载机制](http://www.cnblogs.com/swiftma/p/6901301.html)
+参考：
 
+[Java编程的逻辑 (87) - 类加载机制](http://www.cnblogs.com/swiftma/p/6901301.html)
 
+[Java 类加载器揭秘](https://gitbook.cn/books/5a7719e7367c47172bea2b53/index.html)
+
+http://hllvm.group.iteye.com/group/topic/38709
 
 
 
