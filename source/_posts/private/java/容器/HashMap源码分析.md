@@ -1,26 +1,8 @@
-## Java7 HashMap
+## 1. Java7 HashMap
 
-HashMap 是最简单的，一来我们非常熟悉，二来就是它不支持并发操作，所以源码也非常简单。
+### 1.1 HashMap前瞻
 
-首先，我们用下面这张图来介绍 HashMap 的结构。
-
-![1](https://www.javadoop.com/blogimages/map/1.png)
-
-> 这个仅仅是示意图，因为没有考虑到数组要扩容的情况，具体的后面再说。
-
-大方向上，HashMap 里面是一个**数组**，然后数组中每个元素是一个**单向链表**。
-
-上图中，每个绿色的实体是嵌套类 Entry 的实例，Entry 包含四个属性：key, value, hash 值和用于单向链表的 next。
-
-capacity：当前数组容量，始终保持 2^n，可以扩容，扩容后数组大小为当前的 2 倍。
-
-loadFactor：负载因子，默认为 0.75。
-
-threshold：扩容的阈值，等于 capacity * loadFactor
-
-### HashMap前瞻
-
-####  HashMap使用
+####  1.1.1HashMap使用
 
 ```java
 Map<String, String> map = new HashMap<>();
@@ -28,13 +10,13 @@ map.put("Hello", "world!");
 String value = map.get("Hello");
 ```
 
-#### 一句话总结HashMap的实现
+#### 1.1.2 一句话总结HashMap的实现
 
 **数组 + 链表 + 哈希算法**
 
 ![1](https://www.javadoop.com/blogimages/map/1.png)
 
-#### 重要的属性
+#### 1.1.3 重要的属性
 
 ```java
 capacity：当前数组容量，始终保持 2^n，可以扩容，扩容后数组大小为当前的 2 倍。这不是属性
@@ -48,7 +30,7 @@ Entry<K,V>[] table; Entry数组
 int modCount; // 修改次数
 ```
 
-### HashMap的构造方法
+### 1.2 HashMap的构造方法
 
 基本没做啥事，**数组的初始化不是在构造方法中完成，而是在第一个元素被put的时候完成的**
 
@@ -77,7 +59,7 @@ public HashMap() {
 }
 ```
 
-### put 过程分析
+### 1.3 put 过程分析
 
 还是比较简单的，跟着代码走一遍吧。
 
@@ -113,7 +95,7 @@ public V put(K key, V value) {
 }
 ```
 
-#### 数组初始化
+#### 1.3.1 数组初始化
 
 在第一个元素插入 HashMap 的时候做一次数组的初始化，就是先确定初始的数组大小，并计算数组扩容的阈值。
 
@@ -132,7 +114,7 @@ private void inflateTable(int toSize) {
 
 这里有一个将数组大小保持为 2 的 n 次方的做法，Java7 和 Java8 的 HashMap 和 ConcurrentHashMap 都有相应的要求，只不过实现的代码稍微有些不同，后面再看到的时候就知道了。
 
-#### hash方法分析
+#### 1.3.2 hash方法分析
 
 ```java
 final int hash(Object k) {
@@ -167,7 +149,7 @@ final int hash(Object k) {
 
 参考：[JDK 源码中 HashMap 的 hash 方法原理是什么？](https://www.zhihu.com/question/20733617)
 
-#### 计算具体数组位置
+#### 1.3.3 计算具体数组位置
 
 ```java
 static int indexFor(int hash, int length) {
@@ -186,7 +168,7 @@ static int indexFor(int hash, int length) {
 >
 > ![](https://ws1.sinaimg.cn/large/8747d788gy1fvgeyzj0dej20x0085dfx.jpg)
 
-#### 添加节点到链表中
+#### 1.3.4 添加节点到链表中
 
 找到数组下标后，会先进行 key 判重，如果没有重复，就准备将新值放入到链表的**表头**。
 
@@ -214,7 +196,7 @@ void createEntry(int hash, K key, V value, int bucketIndex) {
 
 这个方法的主要逻辑就是先判断是否需要扩容，需要的话先扩容，然后再将这个新的数据插入到扩容后的数组的相应位置处的链表的表头。
 
-#### 数组扩容
+#### 1.3.5 数组扩容
 
 前面我们看到，在插入新值的时候，如果**当前的 size 已经达到了阈值，并且要插入的数组位置上已经有元素**，那么就会触发扩容，扩容后，数组大小为原来的 2 倍。
 
@@ -257,15 +239,14 @@ void transfer(Entry[] newTable, boolean rehash) {
 
 由于是双倍扩容，迁移过程中，会将原来 table[i] 中的链表的所有节点，分拆到新的数组的 newTable[i] 和 newTable[i + oldLength] 位置上。如原来数组长度是 16，那么扩容后，原来 table[0] 处的链表中的所有元素会被分配到新数组中 newTable[0] 和 newTable[16] 这两个位置。代码比较简单，这里就不展开了。
 
-
-
-### get 过程分析
+### 1.4 get 过程分析
 
 相对于 put 过程，get 过程是非常简单的。
 
+判断key是否为null，然后特殊处理，否则：
 1. 根据 key 计算 hash 值。
 2. 找到相应的数组下标：hash & (length - 1)。
-3. 遍历该数组位置处的链表，直到找到相等(==或equals)的 key。
+3. 遍历该数组位置处的链表，找到则返回，否则返回null。
 
 ```java
 public V get(Object key) {
@@ -300,3 +281,10 @@ final Entry<K,V> getEntry(Object key) {
     return null;
 }
 ```
+
+
+
+参考：
+
+1. [Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析](Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析)
+2. [JDK 源码中 HashMap 的 hash 方法原理是什么？](https://www.zhihu.com/question/20733617)
