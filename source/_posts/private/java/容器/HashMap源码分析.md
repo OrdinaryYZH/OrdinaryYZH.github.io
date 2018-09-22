@@ -114,6 +114,10 @@ private void inflateTable(int toSize) {
 
 这里有一个将数组大小保持为 2 的 n 次方的做法，Java7 和 Java8 的 HashMap 和 ConcurrentHashMap 都有相应的要求，只不过实现的代码稍微有些不同，后面再看到的时候就知道了。
 
+> 如果new HashMap时传入了容量，而且容量为2^n，并且插入的值超过了阈值的话，还是会扩容一次
+>
+> 例如new HashMap(16)，后面put的元素超过了阈值，那么就会扩容到32
+
 #### 1.3.2 hash方法分析
 
 ```java
@@ -237,7 +241,9 @@ void transfer(Entry[] newTable, boolean rehash) {
 
 扩容就是用一个新的大数组替换原来的小数组，并将原来数组中的值迁移到新的数组中。
 
-由于是双倍扩容，迁移过程中，会将原来 table[i] 中的链表的所有节点，分拆到新的数组的 newTable[i] 和 newTable[i + oldLength] 位置上。如原来数组长度是 16，那么扩容后，原来 table[0] 处的链表中的所有元素会被分配到新数组中 newTable[0] 和 newTable[16] 这两个位置。代码比较简单，这里就不展开了。
+由于是双倍扩容，迁移过程中，会将原来 table[i] 中的链表的所有节点，分拆到新的数组的 newTable[i] 和 newTable[i + oldLength] 位置上。如原来数组长度是 16，那么扩容后，原来 table[0] 处的链表中的所有元素会被分配到新数组中 newTable[0] 和 newTable[16] 这两个位置。如下图：多了一倍就是多了一个1，hash的时候就可能多了oldLength了：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fvi5evncszj212z0bo3z1.jpg)
 
 ### 1.4 get 过程分析
 
