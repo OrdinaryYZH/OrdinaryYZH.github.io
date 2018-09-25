@@ -1,4 +1,4 @@
-### 初始化所有的 singleton beans
+# 1. 初始化所有的 singleton beans(finishBeanFactoryInitialization)
 
 我们的重点当然是 finishBeanFactoryInitialization(beanFactory); 这个巨头了，这里会负责初始化所有的 singleton beans。
 
@@ -56,7 +56,7 @@ protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory b
 
 从上面最后一行往里看，我们就又回到 DefaultListableBeanFactory 这个类了，这个类大家应该都不陌生了吧。
 
-#### preInstantiateSingletons
+# 2. preInstantiateSingletons
 
 // DefaultListableBeanFactory 728
 
@@ -133,7 +133,7 @@ public void preInstantiateSingletons() throws BeansException {
 
 接下来，我们就进入到 getBean(beanName) 方法了，这个方法我们经常用来从 BeanFactory 中获取一个 Bean，而初始化的过程也封装到了这个方法里。
 
-#### getBean
+## 2.1 AbstractBeanFactory.getBean -> doGetBean
 
 在继续前进之前，读者应该具备 FactoryBean 的知识，如果读者还不熟悉，请移步附录部分了解 FactoryBean。
 
@@ -318,6 +318,8 @@ protected <T> T doGetBean(
 }
 ```
 
+### 2.1.1 AbstractAutowireCapableBeanFactory.createBean
+
 大家应该也猜到了，接下来当然是分析 createBean 方法：
 
 ```java
@@ -400,7 +402,7 @@ protected Object createBean(String beanName, RootBeanDefinition mbd, Object[] ar
 }
 ```
 
-#### 创建 Bean
+#### 2.1.1.1 AbstractAutowireCapableBeanFactory.doCreateBean
 
 我们继续往里看 doCreateBean 这个方法：
 
@@ -538,7 +540,7 @@ protected Object doCreateBean(final String beanName, final RootBeanDefinition mb
 
 注意了，接下来的这三个方法要认真说那也是极其复杂的，很多地方我就点到为止了，感兴趣的读者可以自己往里看，最好就是碰到不懂的，自己写代码去调试它。
 
-##### 创建 Bean 实例
+##### 2.1.1.1.1 创建 Bean 实例createBeanInstance
 
 我们先看看 createBeanInstance 方法。需要说明的是，这个方法如果每个分支都分析下去，必然也是极其复杂冗长的，我们挑重点说。此方法的目的就是实例化我们指定的类。
 
@@ -684,7 +686,11 @@ public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory ow
 
 到这里，我们就算实例化完成了。我们开始说怎么进行属性注入。
 
-##### bean 属性注入
+###### 2.1.1.1.1.1 图解：
+
+![](https://www.shangyang.me/2017/04/01/spring-core-container-sourcecode-analysis-beans-instantiating-process/do-get-bean-process.png)
+
+##### 2.1.1.1.2 bean 属性注入（populateBean）
 
 看完了 createBeanInstance(...) 方法，我们来看看 populateBean(...) 方法，该方法负责进行属性设值，处理依赖。
 
@@ -771,7 +777,7 @@ protected void populateBean(String beanName, RootBeanDefinition mbd, BeanWrapper
 }
 ```
 
-##### initializeBean
+##### 2.1.1.1.3 initializeBean
 
 属性注入完成后，这一步其实就是处理各种回调了，这块代码比较简单。
 
