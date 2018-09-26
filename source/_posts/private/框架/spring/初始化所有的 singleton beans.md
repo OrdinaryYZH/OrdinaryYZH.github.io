@@ -540,6 +540,10 @@ protected Object doCreateBean(final String beanName, final RootBeanDefinition mb
 
 注意了，接下来的这三个方法要认真说那也是极其复杂的，很多地方我就点到为止了，感兴趣的读者可以自己往里看，最好就是碰到不懂的，自己写代码去调试它。
 
+##### 图解：
+
+![](https://www.shangyang.me/2017/04/01/spring-core-container-sourcecode-analysis-beans-instantiating-process/do-get-bean-process.png)
+
 ##### 2.1.1.1.1 创建 Bean 实例createBeanInstance
 
 我们先看看 createBeanInstance 方法。需要说明的是，这个方法如果每个分支都分析下去，必然也是极其复杂冗长的，我们挑重点说。此方法的目的就是实例化我们指定的类。
@@ -685,10 +689,6 @@ public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory ow
 ```
 
 到这里，我们就算实例化完成了。我们开始说怎么进行属性注入。
-
-###### 2.1.1.1.1.1 图解：
-
-![](https://www.shangyang.me/2017/04/01/spring-core-container-sourcecode-analysis-beans-instantiating-process/do-get-bean-process.png)
 
 ##### 2.1.1.1.2 bean 属性注入（populateBean）
 
