@@ -56,6 +56,13 @@ protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory b
 
 从上面最后一行往里看，我们就又回到 DefaultListableBeanFactory 这个类了，这个类大家应该都不陌生了吧。
 
+1. ★初始化名字为 conversionService 的 Bean
+2. 如果不存在EmbeddedValueResolver，则注册一个StringValueResolver
+3. 先初始化 LoadTimeWeaverAware 类型的 Bean（这是 AspectJ 相关的内容）
+4. 停止使用temporary ClassLoader （beanFactory.setTempClassLoader(null);）
+5. 冻结配置 （beanFactory.freezeConfiguration();）
+6. ★开始初始化 （beanFactory.preInstantiateSingletons()）
+
 # 2. preInstantiateSingletons
 
 // DefaultListableBeanFactory 728
@@ -136,6 +143,8 @@ public void preInstantiateSingletons() throws BeansException {
 ## 2.1 AbstractBeanFactory.getBean -> doGetBean
 
 在继续前进之前，读者应该具备 FactoryBean 的知识，如果读者还不熟悉，请移步附录部分了解 FactoryBean。
+
+### 2.1.1 源码
 
 // AbstractBeanFactory 196
 
@@ -318,7 +327,14 @@ protected <T> T doGetBean(
 }
 ```
 
-### 2.1.1 AbstractAutowireCapableBeanFactory.createBean
+### 2.1.2 总结
+
+1. 名字转换（获取一个 “正统的” beanName，处理两种情况，一个是前面说的 FactoryBean(前面带 ‘&’)）
+2. 缓存中获取：getSingleton(beanName)
+   如果存在并且不是FactoryBean，则返回实例，如果存在且是FactoryBean的话，则返回FactoryBean创建的实例；如果不存在，走第三步
+3. 
+
+### 2.1.3 AbstractAutowireCapableBeanFactory.createBean
 
 大家应该也猜到了，接下来当然是分析 createBean 方法：
 
