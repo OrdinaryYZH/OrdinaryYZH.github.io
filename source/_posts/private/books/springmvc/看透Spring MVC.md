@@ -792,7 +792,7 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 
 流程如下图：
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1fuu1furjf0j21kw1wwhdt.jpg)
+![](https://ws1.sinaimg.cn/large/8747d788gy1fvpq598qigj22ve3h7has.jpg)
 
 ### 10.5 小结
 
@@ -941,7 +941,7 @@ protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpSer
 
 #### 12.3.1 创建AbstractHandlerMethodMapping系列之器
 
-> 先一句话总结：该类实例化后，初始化中查找HandlerMethod，并j将结果放到内部类属性`MappingRegistry`中：
+> 先一句话总结：该类实例化后，初始化中查找HandlerMethod，并将结果放到内部类属性`MappingRegistry`中：
 >
 > ![](http://ww1.sinaimg.cn/large/8747d788gy1fublgw06j9j20sg0d0dqk.jpg)
 
