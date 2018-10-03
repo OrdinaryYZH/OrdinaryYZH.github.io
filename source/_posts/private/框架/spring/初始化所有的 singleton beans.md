@@ -418,7 +418,7 @@ protected Object createBean(String beanName, RootBeanDefinition mbd, Object[] ar
 }
 ```
 
-#### 2.1.1.1 AbstractAutowireCapableBeanFactory.doCreateBean
+#### 2.1.3.1 AbstractAutowireCapableBeanFactory.doCreateBean
 
 我们继续往里看 doCreateBean 这个方法：
 
@@ -560,7 +560,7 @@ protected Object doCreateBean(final String beanName, final RootBeanDefinition mb
 
 ![](https://www.shangyang.me/2017/04/01/spring-core-container-sourcecode-analysis-beans-instantiating-process/do-get-bean-process.png)
 
-##### 2.1.1.1.1 创建 Bean 实例createBeanInstance
+##### 2.1.3.1.1 创建 Bean 实例createBeanInstance
 
 我们先看看 createBeanInstance 方法。需要说明的是，这个方法如果每个分支都分析下去，必然也是极其复杂冗长的，我们挑重点说。此方法的目的就是实例化我们指定的类。
 
@@ -706,7 +706,7 @@ public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory ow
 
 到这里，我们就算实例化完成了。我们开始说怎么进行属性注入。
 
-##### 2.1.1.1.2 bean 属性注入（populateBean）
+##### 2.1.3.1.2 bean 属性注入（populateBean）
 
 看完了 createBeanInstance(...) 方法，我们来看看 populateBean(...) 方法，该方法负责进行属性设值，处理依赖。
 
@@ -793,7 +793,7 @@ protected void populateBean(String beanName, RootBeanDefinition mbd, BeanWrapper
 }
 ```
 
-##### 2.1.1.1.3 initializeBean
+##### 2.1.3.1.3 initializeBean
 
 属性注入完成后，这一步其实就是处理各种回调了，这块代码比较简单。
 
