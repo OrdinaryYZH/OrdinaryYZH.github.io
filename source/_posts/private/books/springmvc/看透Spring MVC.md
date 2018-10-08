@@ -803,7 +803,7 @@ RequestMappingHandlerAdapter实现的三个模板方法内容如下：
 
 * 参数的值的来源
 
-  1. request中相关的参数，狐妖包括url中的参数、post过来的参数以及请求头所包含的值
+  1. request中相关的参数，包括url中的参数、post过来的参数以及请求头所包含的值
   2. cookie中的参数
   3. session中的参数
   4. 设置到FlashMap中的参数，这种参数主要用于redirect的参数传递
