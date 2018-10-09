@@ -184,6 +184,7 @@ DispatcherServlet中的入口方法是doService()，但是核心处理是doDispa
    5. inputFlashMap：用于保存上次请求中转发过来的属性
    6. outputFlashMap：用于保存本次请求需要转发的属性
    7. flashMapManager：用于管理上述2个属性
+3. 调用doDispatch(request, response)
 
 代码如下：
 
@@ -224,7 +225,7 @@ protected void doService(HttpServletRequest request, HttpServletResponse respons
     request.setAttribute(FLASH_MAP_MANAGER_ATTRIBUTE, this.flashMapManager);
 
     try {
-        doDispatch(request, response);
+-->     doDispatch(request, response);
     }
     finally {
         if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
@@ -263,7 +264,7 @@ doDispatch()方法做了以下事情：
 
 1. 根据request找到Handler
 2. 根据Handler找到对应的HandlerAdapter
-3. 用HandlerAdapter处理Handler
+3. HandlerAdapter使用Handler处理请求
 4. 调用processDispatchResult()方法处理上面处理之后的结果（包含找到View并渲染输出给用户）
 
 代码如下：
