@@ -102,7 +102,7 @@ Redis可执行文件说明
    * 生产环境选择配置文件启动
    * 单机多实例 配置文件可以用端口区分开
 6. 验证
-   1. p -rd | grep redis
+   1. ps -ef | grep redis
    2. netstat -antpl | grep redis
    3. redis-cli -h ip -p port ping
 
