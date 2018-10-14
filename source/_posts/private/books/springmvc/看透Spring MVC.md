@@ -238,7 +238,7 @@ String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getN
 
 
 
-   知识点：ApplicationListener机制
+###### 知识点：ApplicationListener机制
 
    createWebApplicationContext(ApplicationContext parent)：
 
