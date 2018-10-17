@@ -7,7 +7,7 @@
 1. 解压安装包，并配置安装目录，这里将目录设置到/opt/erlang下（解压路径不放到/opt/erlang下也可以，记得配置./configure文件就好）
 
    ```shell
-   tar -zxvf opt_src_....tar.gz -C /opt/erlang（tar -Jxf opt_src_....tar.xz -C /opt/erlang）
+   tar -zxvf opt_src_....tar.gz -C /opt/erlang（tar -Jxvf opt_src_....tar.xz -C /opt/erlang）
    cd /opt/erlang
    ./configure --prefix=/opt/erlang
    ```
