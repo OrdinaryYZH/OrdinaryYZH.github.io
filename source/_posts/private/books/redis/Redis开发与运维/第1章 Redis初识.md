@@ -1,0 +1,146 @@
+##  第1章 Redis初识
+
+### 1.2 Redis的特性
+
+1. 速度快
+   * 基于内存
+   * 使用C语言实现，更接近底层，执行速度更快
+   * 使用单线程架构，预防了多线程可能的竞争问题，没有线程间切换时的时间
+   * 使用I/O多路复用模型
+2. 基于键值对的数据结构服务器
+3. 丰富的功能（提供5种数据结构外，还提供了许多额外的功能）
+4. 简单稳定
+   * 实现的源码不多；
+   * 而且使用单线程模型，服务端跟客户端处理都变得简单；
+   * Redis不依赖操作系统中的类库
+5. 客户端语言多
+6. 持久化
+7. 主从复制
+8. 高可用、分布式
+
+### 1.3. Redis典型应用场景
+
+#### 1.3.1 Redis 可以做什么
+
+1. 缓存系统
+2. 排行榜
+3. 计数器
+4. 社交网络
+5. 消息队列系统
+
+#### 1.3.2 Redis不能做什么 
+
+1. 数据规模角度：数据规模可分为大规模数据和小规模数据，Redis存大规模数据显然不合适
+2. 冷热数据角度：冷数据（操作不频繁的数据）不适合放Redis，对内存的一种浪费；但是对于热数据，放在Redis中可以加速读写，也可以减轻后端存储的负载，可以说是事半功倍
+
+### 1.4 用好Redis的建议
+
+> 切勿当做黑盒使用，开发与运维同样重要
+>
+> 1. 如果不了解Redis的单线程模型，有些开发者会在有上千万个键的Redis上执行keys *
+> 2. 如果不了解持久化的相关原理，会在一个操作量很大的Redis上配置自动保存RDB
+
+
+
+### 1.5 正确安装并启动Redis
+
+#### 1.5.1 安装Redis
+
+Linux下软件安装的2种方式：
+
+* 通过各个操作系统的软件管理软件安装，例如CentOS的yum，Ubuntu的apt；但是管理工具不一定更新到最新版本
+* 源码的方式安装
+
+```
+1) 下载Redis指定版本你的源码压缩包到当前目录
+	wget http://download.redis.io/redis-3.0.7.tar.gz
+2) 解压
+	tar xvzf redis-3.0.7.tar.gz
+3) 建立一个redis目录的软连接，指向redis-3.0.7
+	ln -s redis-3.0.7 redis
+4)进入redis目录
+	cd redis-3.0.7
+5)编译
+	make
+6)安装
+	make install
+```
+
+有两点要注意：
+
+1. 第3步建立了一个redis目录的软连接，是为了不把redis目录固定在指定版本上，有利于Redis未来版本升级
+2. 第6步的安装是将Redis的相关运行文件放到/usr/local/bin下，这样就可以在任意目录下执行Redis的命令
+
+装完后：redis-cli -v查看版本
+
+#### 1.5.2 配置、启动、操作、关闭Redis
+
+Redis可执行文件说明
+
+| 可执行文件       | 作用              |
+| ---------------- | ----------------- |
+| redis-server     | Redis服务器       |
+| redis-cli        | Redis命令行客户端 |
+| redis-benchmark  | Redis性能测试工具 |
+| redis-check-aof  | AOF文件修复工具   |
+| redis-check-dump | RDB文件检查工具   |
+| redis-sentinal   | Sentinal服务器    |
+
+##### 1.5.2.1 启动Redis
+
+1. 最简启动：redis-server
+2. 动态参数启动
+   redis-server -p 6380
+3. 配置文件启动
+   redis-server configPath
+4. redis常用配置
+   - daemonize：是否是守护进程
+   - port：端口
+   - logfile：Redis系统日志
+   - dir：Redis工作目录
+5. 三种启动方式的比较
+   * 生产环境选择配置文件启动
+   * 单机多实例 配置文件可以用端口区分开
+6. 验证
+   1. ps -ef | grep redis
+   2. netstat -antpl | grep redis
+   3. redis-cli -h ip -p port ping
+
+##### 1.5.2.2 redis客户端
+
+1. 连接
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7paa05mj21kc0gxws7.jpg)
+
+2. 返回值
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7syb774j21if0y9e11.jpg)
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7vh6smvj21m20jswqu.jpg)
+
+##### 1.5.2.3 停止Redis服务
+
+   ```
+redis-cli shutdown
+   ```
+
+   注意三点：
+
+   1. 关闭的过程：断开与和客户端的连接，持久化文件生成，是一种优雅的关闭方式
+
+   2. 也可以通过kill进程号关闭，但是不要用kill -9强制杀死Redis服务
+
+   3. shutdown还有个参数：代表关闭前是否生成持久化文件
+      ``` redis -cli shutdown nosave|save```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
