@@ -47,7 +47,7 @@ RabbitMQ的安装简单很多，解压后，配置下即可：
 1. 解压：
 
     ```shell
-    tar zvxf rabbitmq-server-generic-unix-xxx.tar.gz -C /opt
+    tar zxvf rabbitmq-server-generic-unix-xxx.tar.gz -C /opt
     cd /opt
     #建立软连接
     ln -sv rabbitmq_server-xxx rabbitmq
