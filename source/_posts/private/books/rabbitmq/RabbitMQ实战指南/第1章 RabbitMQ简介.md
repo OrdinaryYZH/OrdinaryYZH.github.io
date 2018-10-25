@@ -83,3 +83,51 @@ rabbitmqctl status
 rabbitmqctl cluster_status #查看集群状态
 ```
 
+
+
+#### 1.4.4 生产者与消费消息
+
+##### 添加账号
+
+> 默认情况下访问RabbitMQ的用户名和密码都是"guest"，这个账号有限制，只能通过本地localhost访问，所以我们需要添加一个用户
+
+1. 添加新用户：
+
+   ```shell
+   [root@localhost ~]# rabbitmqctl add_user root root123
+   Adding user "root" ...
+   ```
+
+2. 为root用户设置所有权限
+
+   ```shell
+   [root@localhost ~]# rabbitmqctl set_permissions -p / root ".*" ".*" ".*"
+   Setting permissions for user "root" in vhost "/" ...
+   ```
+
+3. 设置root用户为管理员角色
+
+   ```shell
+   [root@localhost ~]# rabbitmqctl set_user_tags root administrator
+   Setting tags for user "root" to [administrator] ...
+   ```
+
+##### 一个生产者跟消费者例子（具体看代码）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
