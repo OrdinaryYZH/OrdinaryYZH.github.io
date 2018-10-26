@@ -109,11 +109,11 @@ Redis可执行文件说明
 ##### 1.5.2.2 redis客户端
 
 1. 连接
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7paa05mj21kc0gxws7.jpg)
+   ![](https://ws1.sinaimg.cn/mw690/8747d788gy1frq7paa05mj21kc0gxws7.jpg)
 
 2. 返回值
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7syb774j21if0y9e11.jpg)
-   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7vh6smvj21m20jswqu.jpg)
+   ![](https://ws1.sinaimg.cn/mw690/8747d788gy1frq7syb774j21if0y9e11.jpg)
+   ![](https://ws1.sinaimg.cn/mw690/8747d788gy1frq7vh6smvj21m20jswqu.jpg)
 
 ##### 1.5.2.3 停止Redis服务
 
