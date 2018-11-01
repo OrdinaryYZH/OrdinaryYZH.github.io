@@ -2,6 +2,10 @@
 
 ### 2.1 相关概念介绍
 
+RabbitMQ模型架构：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fwt02cto5vj20hn08ajs3.jpg)
+
 #### 2.1.1 生产者和消费者
 
 #### 2.1.2 队列
