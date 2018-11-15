@@ -29,6 +29,14 @@ Queue:队列，是RabbitMQ的内部对象，**用于存储消息**。
 
 #### 2.1.3 交换器、路由键、绑定
 
+Exchange：交换器。生产者将消息发送到Exchange，由交换器将消息路由到一个或者多个队列中。如果路由不到，可能返回给生产者，或许直接丢弃。
+
+RoutingKey：路由键。
+
+Binding：绑定。
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fx96ii46bkj21ox0xx19e.jpg)
+
 #### 2.1.4 交换器类型 
 
 #### 2.1.5 RabbitMQ运转流程
