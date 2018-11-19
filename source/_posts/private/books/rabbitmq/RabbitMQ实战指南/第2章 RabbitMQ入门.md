@@ -4,7 +4,7 @@
 
 RabbitMQ模型架构：
 
-![](https://ws1.sinaimg.cn/large/8747d788gy1fwt02cto5vj20hn08ajs3.jpg)
+![](https://ws1.sinaimg.cn/large/8747d788gy1fxcpoojs6hj21b60m4ti4.jpg)
 
 #### 2.1.1 生产者和消费者
 
@@ -24,8 +24,8 @@ Queue:队列，是RabbitMQ的内部对象，**用于存储消息**。
 
 * RabbitMQ中的消息只能存在队列中（与Kafka不同）
 * RabbitMQ的生产者消息最终投递到队列中，消费者从队列中获取消息并消费
-* 多个消费者可订阅同一个队列，这时队列中的消息会被平摊（轮训）给各个消费者处理，不是各个消费者都收到消息并处理
-* RabbitMQ不支持队列层面的广播消费。（如果需要广播消费，需要在其上进行二次开发，处理逻辑会变得异常复杂，不建议）
+* 多个消费者可订阅同一个队列，这时队列中的消息会**被平摊**（轮训）给各个消费者处理，不是各个消费者都收到消息并处理
+* RabbitMQ**不支持队列层面的广播消费**。（如果需要广播消费，需要在其上进行二次开发，处理逻辑会变得异常复杂，不建议）
 
 #### 2.1.3 交换器、路由键、绑定
 
@@ -41,13 +41,32 @@ Binding：绑定。（可以有多个）
 
 > RabbitMQ常用的交换器类型有fanout、direct、topic、headers这四种。AMQP协议列还提到了另外两种：System和自定义，这里不说
 
-##### 1. fanout：将消息发送给所有绑定到该交换器的队列中
+##### 1. fanout(扇出)
+
+> 将消息发送给所有绑定到该交换器的队列中（**散弹枪**）
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fxcou3wk91j218g0mojuk.jpg)
 
 ##### 2. direct
 
+>  把消息路由到那些BindingKey和RoutingKey完全匹配的队列中（**激光枪**）
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fxcpqv85vhj20y70crwh0.jpg)
+
 ##### 3. topic
 
+> 也是将消息路由到BindingKey和RoutingKey相匹配的队列中，但是存在匹配规则：
+
+1. ".": RoutingKey和BindingKey都为一个"."分割的字符串(被"."分隔开的每一段独立的字符串成为一个单词）
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1fxcpkjk611j20i1082q2z.jpg)
+2. "*": 模糊匹配，代表一个单词
+3. "#": 模糊匹配，用于匹配多规则单词（包括0个）
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fxcpulo12fj20yh0bp0uy.jpg)
+
 ##### 4. headers
+
+> 该类型交换器不依赖于路由键的匹配规则，而是根据发送的消息内容中的headers属性进行匹配。又分any和all两种。（这个类型的交换器性能会很差，而且也不实用，所以很少用）
 
 #### 2.1.5 RabbitMQ运转流程
 
