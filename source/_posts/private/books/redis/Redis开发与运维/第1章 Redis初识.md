@@ -2,17 +2,17 @@
 
 ### 1.2 Redis的特性
 
-1. 速度快
+1. (**首先**)基于键值对的数据结构服务器
+2. 速度快
    * 基于内存
    * 使用C语言实现，更接近底层，执行速度更快
    * 使用单线程架构，预防了多线程可能的竞争问题，没有线程间切换时的时间
    * 使用I/O多路复用模型
-2. 基于键值对的数据结构服务器
-3. 丰富的功能（提供5种数据结构外，还提供了许多额外的功能）
-4. 简单稳定
+3. 简单稳定
    * 实现的源码不多；
    * 而且使用单线程模型，服务端跟客户端处理都变得简单；
    * Redis不依赖操作系统中的类库
+4. 丰富的功能（提供5种数据结构外，还提供了许多额外的功能）
 5. 客户端语言多
 6. 持久化
 7. 主从复制
@@ -118,11 +118,11 @@ Redis可执行文件说明
 ##### 1.5.2.2 redis客户端
 
 1. 连接
-   ![](https://ws1.sinaimg.cn/mw690/8747d788gy1frq7paa05mj21kc0gxws7.jpg)
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7paa05mj21kc0gxws7.jpg)
 
 2. 返回值
-   ![](https://ws1.sinaimg.cn/mw690/8747d788gy1frq7syb774j21if0y9e11.jpg)
-   ![](https://ws1.sinaimg.cn/mw690/8747d788gy1frq7vh6smvj21m20jswqu.jpg)
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7syb774j21if0y9e11.jpg)
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1frq7vh6smvj21m20jswqu.jpg)
 
 ##### 1.5.2.3 停止Redis服务
 
