@@ -99,7 +99,7 @@ Binding：绑定。（可以有多个）
 
 > Connection：相当于一个TCP链接
 >
-> Channel：简历在Connection上的虚拟链接，每个Channel被指派一个唯一的ID
+> Channel：建立在Connection上的虚拟链接，每个Channel被指派一个唯一的ID
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1fxhbjs7cawj21ak0rqwqi.jpg)
 
