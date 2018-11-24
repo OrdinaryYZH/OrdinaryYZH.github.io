@@ -379,7 +379,7 @@ OK
 | **lpop (key)**               | 左边弹出                                                     |
 | **rpop (key)**               | 右边弹出                                                     |
 | **lrem (key, count, value)** | 删除指定元素(value)，个数为count<br />count>0：从左到右删除count个；<br />count<0：从右到左删除count个；<br />count=0：删除所有 |
-| **ltrim (key, start, end)**  | 删除下标[start, end]的元素                                   |
+| **ltrim (key, start, end)**  | **保留**下标[start, end]的元素，start和end都是以下标0开头    |
 
 ##### 4. 修改
 
