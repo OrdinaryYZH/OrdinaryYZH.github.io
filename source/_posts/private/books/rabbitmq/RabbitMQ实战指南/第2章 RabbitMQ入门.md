@@ -117,6 +117,14 @@ Binding：绑定。（可以有多个）
 
 ### 2.2 AMQP协议介绍
 
+> 背景：RabbitMQ实现了AMQP协议
+
+AMQP协议包括三层：
+
+* Module Layer
+* Session Layer
+* Transport Layer
+
 #### 2.1.1 AMQP生产者流转过程
 
 #### 2.1.2 AMQP消费者流转过程
