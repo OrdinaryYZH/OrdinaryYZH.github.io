@@ -119,11 +119,13 @@ Binding：绑定。（可以有多个）
 
 > 背景：RabbitMQ实现了AMQP协议
 
-AMQP协议包括三层：
+AMQP协议包括三层：(不太明白)
 
-* Module Layer
-* Session Layer
-* Transport Layer
+![](https://ws1.sinaimg.cn/large/8747d788gy1fxqirby7lrj21kw0xok8w.jpg)
+
+* Module Layer：位于协议最高层，主要定义了一些供客户端调用的命令，客户端可以利用这些命令实现自己的业务逻辑，例如，客户端可以通过Queue.Declare声明一个队列，利用Basic.Consume命令获取一个队列中的消息。
+* Session Layer：主要负责将客户端的命令发送给服务器，在将服务器端的应答返回给客户端，主要为客户端与服务器之间通信提供可靠性、同步机制和错误处理。
+* Transport Layer：主要传输二进制数据流，提供帧的处理、信道复用、错误检测和数据表示。
 
 #### 2.1.1 AMQP生产者流转过程
 
