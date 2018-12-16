@@ -6,6 +6,10 @@
 >
 > ![](https://ws1.sinaimg.cn/large/8747d788gy1fy55skxzoxj20wv0jz0to.jpg)
 
+记不住的概念，只好用图来实体化，容易记点：
+
+![](https://ws1.sinaimg.cn/large/8747d788gy1fy8p19t1jkj21d40o0n7m.jpg)
+
 ## 8.3 模式讲解
 
 ### 8.3.1 认识生成器模式
