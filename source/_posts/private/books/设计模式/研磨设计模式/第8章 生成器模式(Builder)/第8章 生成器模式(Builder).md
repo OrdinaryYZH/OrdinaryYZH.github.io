@@ -34,7 +34,7 @@
 Builder builder = new ConcreteBuilder();
 Director director = new Director(builder);
 director.construct(); // 貌似传统的construct方法是没有返回product的
-Product product = builder.build();
+Product product = builder.getResult();
 ```
 
 #### 4. 生成器模式的调用顺序示意图
