@@ -51,8 +51,8 @@ Object receiveAndConvert(String queueName) throws AmqpException;
 
 同样的消息会存放到两个队列中，然后由不同的接收方法处理
 
-* 一个接受Message
-* 一个接受Java Bean
+* 一个接收Message
+* 一个接收Java Bean
 
 ![](https://ws1.sinaimg.cn/large/8747d788gy1fydkmiy8jtj21kw0j0n6u.jpg)
 
