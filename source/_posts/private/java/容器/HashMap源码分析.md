@@ -182,7 +182,7 @@ void addEntry(int hash, K key, V value, int bucketIndex) {
     if ((size >= threshold) && (null != table[bucketIndex])) {
         // 扩容，后面会介绍一下
         resize(2 * table.length);
-        // 扩容以后，重新计算 hash 值
+        // 扩容以后，重新计算 hash 值（貌似没必要吧，hash不会变）
         hash = (null != key) ? hash(key) : 0;
         // 重新计算扩容后的新的下标
         bucketIndex = indexFor(hash, table.length);
