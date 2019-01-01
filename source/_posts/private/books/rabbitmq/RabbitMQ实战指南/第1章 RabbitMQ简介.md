@@ -18,11 +18,11 @@
 
    业务逻辑需要用户在登录完成之后，为用户发送推送短信，同时在安全系统中进行记录，甚至还需要给用户进行消息推送等功能。如果使用直接服务调用的方式，就会使得登陆系统的越来越臃肿，逻辑与其他服务紧密耦合在一起。如果要增加新的功能，需要改动的地方也会比较多
 
-   ![](http://intheworld.win/wordpress/wp-content/uploads/2017/05/image189.png)
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1fyrfq69ga2j21kw1334ac.jpg)
 
    作为对比，贴出一张使用消息中间件的结构图:
 
-   ![](http://intheworld.win/wordpress/wp-content/uploads/2017/05/image-2.png)
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1fyrfrnnqhoj21kw17paos.jpg)
 
    > 参考：[理解消息中间件](http://intheworld.win/2017/05/13/%E7%90%86%E8%A7%A3%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/)
 
@@ -31,7 +31,7 @@
 3. 扩展性
 
    消息中间件本身可以分布式部署，所以其本身具有比较强的扩展性。同时，使用消息中间件的架构本身也具有很好的可扩展性。
-   ![](http://intheworld.win/wordpress/wp-content/uploads/2017/05/mq-1.jpg)
+   ![](https://ws1.sinaimg.cn/large/8747d788gy1fyrfsdjvkej21kw0vw4mn.jpg)
 
    其原因其实简单，看上面这张图就能一目了然了。对于基于消息系统的架构来说，消息生产者与消费者的水平扩展非常简单，只是**简单地增加消息队列的Publisher和Subscriber**而已
 
